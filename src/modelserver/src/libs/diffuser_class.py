@@ -46,7 +46,10 @@ class DiffusersModel(Model):
             # try loading from a single file..
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, torch_dtype=dtype, variant="fp16", use_safetensors=True)
 
+        pipeline.enable_attention_slicing()
+        pipeline.enable_sequential_cpu_offload()
         pipeline.to(device)
+
         self.pipeline = pipeline
         self.device = device
         # The ready flag is used by model ready endpoint for readiness probes,
