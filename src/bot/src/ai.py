@@ -9,7 +9,7 @@ import io
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
-from src import InferRequest
+from . import InferRequest
 import structlog
 log = structlog.get_logger()
 
