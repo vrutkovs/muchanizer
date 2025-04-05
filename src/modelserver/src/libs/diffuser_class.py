@@ -9,7 +9,7 @@ from typing import Dict, Union
 # import libraries
 try:
     import random
-    from torch import Generator
+    from torch import Generator, channels_last, compile
     from kserve import Model, InferRequest, InferResponse
     from kserve.errors import InvalidInput
     from diffusers import AutoPipelineForImage2Image
@@ -48,6 +48,11 @@ class DiffusersModel(Model):
 
         pipeline.enable_attention_slicing()
         pipeline.enable_sequential_cpu_offload()
+
+        # Kandinsky tricks
+        pipeline.unet.to(memory_format=channels_last)
+        pipeline.unet = compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
+
         pipeline.to(device)
 
         self.pipeline = pipeline
