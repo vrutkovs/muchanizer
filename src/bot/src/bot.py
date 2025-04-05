@@ -33,7 +33,7 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def downloader(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Download file
     new_file = await update.message.effective_attachment[-1].get_file()
-    file = await new_file.download_to_drive()
+    file = await new_file.download_to_drive(custom_path="/tmp")
 
     return file
 
