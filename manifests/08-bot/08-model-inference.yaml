@@ -21,6 +21,15 @@ spec:
     containers:
       - name: kserve-container
         image: "image-registry.openshift-image-registry.svc:5000/mirror-mirror/mirror-mirror:model"
+        resources:
+          limits:
+            cpu: "10"
+            memory: 30Gi
+            nvidia.com/gpu: "1"
+          requests:
+            cpu: "6"
+            memory: 24Gi
+            nvidia.com/gpu: "1"
         env:
           - name: MODEL_ID
             value: "kandinsky-community/kandinsky-3"
