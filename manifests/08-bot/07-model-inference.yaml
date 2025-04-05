@@ -31,6 +31,6 @@ spec:
       - effect: NoSchedule
         key: nvidia.com/gpu
         operator: Exists
-  volumes:
-    - emptyDir:
-      name: hg-cache
+    volumes:
+      - emptyDir: {}
+        name: hg-cache
