@@ -37,6 +37,7 @@ class DiffusersModel(Model):
 
     # load weights and instantiate pipeline
     def load(self):
+        print(f"Loading model  {self.model_id}")
         # detect accelerator
         device, dtype = get_accelerator_device()
         try:
@@ -50,6 +51,7 @@ class DiffusersModel(Model):
         self.device = device
         # The ready flag is used by model ready endpoint for readiness probes,
         # set to True when model is loaded successfully without exceptions.
+        print("Loading complete")
         self.ready = True
 
     # process incoming request payload.
