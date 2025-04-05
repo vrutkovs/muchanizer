@@ -21,7 +21,13 @@ spec:
     containers:
       - name: kserve-container
         image: "image-registry.openshift-image-registry.svc:5000/mirror-mirror/mirror-mirror:model"
+        volumeMounts:
+          - mountPath: /opt/app-root/src/.cache
+            name: hg-cache
     tolerations:
       - effect: NoSchedule
         key: nvidia.com/gpu
         operator: Exists
+  volumes:
+    - emptyDir:
+      name: hg-cache
