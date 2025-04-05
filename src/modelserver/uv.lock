@@ -136,6 +136,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "diffusers" },
     { name = "kserve" },
+    { name = "pillow" },
     { name = "torch" },
 ]
 
@@ -143,6 +144,7 @@ dependencies = [
 requires-dist = [
     { name = "diffusers", specifier = ">=0.32.2" },
     { name = "kserve", specifier = ">=0.15.0" },
+    { name = "pillow", specifier = ">=11.1.0" },
     { name = "torch", specifier = ">=2.6.0" },
 ]
 

@@ -14,6 +14,7 @@ try:
     from kserve.errors import InvalidInput
     from diffusers import AutoPipelineForImage2Image
     from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
+    from PIL import Image
 except Exception as e:
     print(f"Caught Exception during library loading: {e}")
     raise e
@@ -79,6 +80,9 @@ class DiffusersModel(Model):
             # malformed or missing input payload
             raise InvalidInput("invalid payload")
 
+        if not payload.get("instances", {}).get("image_b64"):
+            raise InvalidInput("invalid payload - image_b64 not set")
+
         # return generation data
         return payload["instances"][0]
 
@@ -95,6 +99,12 @@ class DiffusersModel(Model):
             # Setup Scheduler
             print(f"Generating with Noise Scheduler {payload.get('scheduler')}")
             self.pipeline.scheduler = schedulers.get(payload.get("scheduler")).from_config(self.pipeline.scheduler.config)
+
+            # Convert base64 encoded image to PIL Image
+            image_b64 = payload.get("image_b64")
+            image = Image.open(io.BytesIO(base64.b64decode(image_b64)))
+            payload["image"] = image
+
             # generate image
             image = self.pipeline(**payload).images[0]
         except Exception:  # error during generation. return random noise

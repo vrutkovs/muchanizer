@@ -6,8 +6,9 @@ readme = "README.md"
 requires-python = "==3.12.9"
 dependencies = [
     "torch>=2.6.0",
- "kserve>=0.15.0",
- "diffusers>=0.32.2",
+    "kserve>=0.15.0",
+    "diffusers>=0.32.2",
+    "pillow>=11.1.0",
 ]
 
 [[tool.uv.index]]
