@@ -1,4 +1,3 @@
-from enum import verify
 from PIL import ImageFile, Image
 from typing import Final
 import requests
@@ -11,7 +10,6 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 from request import InferRequest,InferResponse
-from mypy.typeops import F
 import structlog
 log = structlog.get_logger()
 
@@ -20,8 +18,11 @@ if not MODEL_ENDPOINT:
     raise Exception("MODEL_ENDPOINT not set")
 
 MODEL_TOKEN: Final = os.getenv("MODEL_TOKEN")
-if not MODEL_TOKEN:
-    raise Exception("MODEL_TOKEN not set")
+HEADERS = {
+    "Content-Type": "application/json",
+}
+if MODEL_TOKEN:
+    HEADERS["Authorization"] = f"Bearer {MODEL_TOKEN}"
 
 async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
     image_bytes = io.BytesIO()
@@ -41,10 +42,7 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
     response = requests.post(
         MODEL_ENDPOINT,
         data=infer_request_json,
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {MODEL_TOKEN}",
-        },
+        headers=HEADERS,
         verify=False)
     response.raise_for_status()
 
