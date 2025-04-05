@@ -7,7 +7,7 @@ WORKDIR /app
 COPY uv.lock pyproject.toml /app/
 USER root
 RUN uv sync --frozen --no-install-project --no-dev
-COPY /src /app
+COPY src /app
 RUN uv sync --frozen --no-dev
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8080
