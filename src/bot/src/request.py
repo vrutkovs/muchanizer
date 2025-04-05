@@ -1,5 +1,5 @@
 class InferRequest:
-    image_b64: bytes
+    image_b64: str
     prompt: str
     negative_prompt: str
     num_inference_steps: int
@@ -7,7 +7,7 @@ class InferRequest:
     height: int
     guidance_scale: float
 
-    def __init__(self, image_b64: bytes, prompt: str, negative_prompt: str,
+    def __init__(self, image_b64: str, prompt: str, negative_prompt: str,
                  num_inference_steps: int, width: int, height: int,
                  guidance_scale: float):
         self.image_b64 = image_b64
