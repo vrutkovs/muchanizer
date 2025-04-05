@@ -5,18 +5,15 @@ class InferRequest:
     num_inference_steps: int
     width: int
     height: int
-    guidance_scale: float
 
     def __init__(self, image_b64: str, prompt: str, negative_prompt: str,
-                 num_inference_steps: int, width: int, height: int,
-                 guidance_scale: float):
+                 num_inference_steps: int, width: int, height: int):
         self.image_b64 = image_b64
         self.prompt = prompt
         self.negative_prompt = negative_prompt
         self.num_inference_steps = num_inference_steps
         self.width = width
         self.height = height
-        self.guidance_scale = guidance_scale
 
 
 class InferResponse:
