@@ -9,6 +9,7 @@ dependencies = [
     "kserve>=0.15.0",
     "diffusers>=0.32.2",
     "pillow>=11.1.0",
+    "transformers>=4.50.3",
 ]
 
 [[tool.uv.index]]
