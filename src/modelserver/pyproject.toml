@@ -1,0 +1,16 @@
+[project]
+name = "diffusers-modelserver"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = "==3.12.9"
+dependencies = [
+    "torch>=2.6.0",
+ "kserve>=0.15.0",
+ "diffusers>=0.32.2",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
