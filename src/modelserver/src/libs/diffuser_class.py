@@ -89,27 +89,23 @@ class DiffusersModel(Model):
     # perform a forward pass (inference) and return generated data
     def predict(self, payload: Union[Dict, InferRequest], headers: Dict[str, str] = None) -> Union[Dict, InferResponse]:
         # generate images
-        try:
-            # set a fixed seed if necessary
-            if payload.get("seed") == -1:
-                payload["generator"] = Generator(self.device).manual_seed(random.getrandbits(RANDOM_BITS_LENGTH))
-            else:
-                payload["generator"] = Generator(self.device).manual_seed(payload.get("seed"))
+        # set a fixed seed if necessary
+        if payload.get("seed") == -1:
+            payload["generator"] = Generator(self.device).manual_seed(random.getrandbits(RANDOM_BITS_LENGTH))
+        else:
+            payload["generator"] = Generator(self.device).manual_seed(payload.get("seed"))
 
-            # Setup Scheduler
-            print(f"Generating with Noise Scheduler {payload.get('scheduler')}")
-            self.pipeline.scheduler = schedulers.get(payload.get("scheduler")).from_config(self.pipeline.scheduler.config)
+        # Setup Scheduler
+        print(f"Generating with Noise Scheduler {payload.get('scheduler')}")
+        self.pipeline.scheduler = schedulers.get(payload.get("scheduler")).from_config(self.pipeline.scheduler.config)
 
-            # Convert base64 encoded image to PIL Image
-            image_b64 = payload.get("image_b64")
-            image = Image.open(io.BytesIO(base64.b64decode(image_b64)))
-            payload["image"] = image
+        # Convert base64 encoded image to PIL Image
+        image_b64 = payload.get("image_b64")
+        image = Image.open(io.BytesIO(base64.b64decode(image_b64)))
+        payload["image"] = image
 
-            # generate image
-            image = self.pipeline(**payload).images[0]
-        except Exception:  # error during generation. return random noise
-            import numpy as np
-            image = np.random.rand(payload.get("width"), payload.get("height"), 3)
+        # generate image
+        image = self.pipeline(**payload).images[0]
 
         # convert images to PNG and encode in base64
         # for easy sending via response payload

@@ -32,5 +32,6 @@ spec:
         key: nvidia.com/gpu
         operator: Exists
     volumes:
-      - emptyDir: {}
+      - persistentVolumeClaim:
+          claimName: hg-cache
         name: hg-cache
