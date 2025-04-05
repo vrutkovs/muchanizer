@@ -9,9 +9,6 @@ USER root
 RUN uv sync --frozen --no-install-project --no-dev
 COPY /src /app
 RUN uv sync --frozen --no-dev
-
-FROM base
-COPY --from=builder /app /app
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8080
-CMD ["python", "/app/model.py"]
+CMD ["bash", "-c", "source /app/.venv/bin/activate && exec python /app/model.py"]

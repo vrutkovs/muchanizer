@@ -11,4 +11,4 @@ COPY src /app
 RUN uv sync --frozen --no-dev
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8080
-CMD ["python", "/app/bot.py"]
+CMD ["bash", "-c", "source /app/.venv/bin/activate && exec python /app/bot.py"]
