@@ -6,6 +6,7 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 WORKDIR /app
 COPY uv.lock pyproject.toml /app/
 USER root
+RUN dnf install -y git-lfs && dnf clean all
 RUN uv sync --frozen --no-install-project --no-dev
 COPY /src /app
 RUN uv sync --frozen --no-dev
