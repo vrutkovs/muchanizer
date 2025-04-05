@@ -6,7 +6,11 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 WORKDIR /app
 COPY uv.lock pyproject.toml /app/
 USER root
-RUN dnf install -y git-lfs && dnf clean all
+RUN dnf install -y git-lfs && \
+    dnf clean all && \
+    git lfs install && \
+    python -m pip install huggingface_hub
+RUN huggingface-cli download kandinsky-community/kandinsky-3
 RUN uv sync --frozen --no-install-project --no-dev
 COPY /src /app
 RUN uv sync --frozen --no-dev
