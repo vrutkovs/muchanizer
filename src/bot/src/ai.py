@@ -1,3 +1,4 @@
+from enum import verify
 from PIL import ImageFile, Image
 from typing import Final
 import requests
@@ -10,6 +11,7 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 from request import InferRequest,InferResponse
+from mypy.typeops import F
 import structlog
 log = structlog.get_logger()
 
@@ -42,7 +44,8 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
         headers={
             "Content-Type": "application/json",
             "Authorization": f"Bearer {MODEL_TOKEN}",
-        })
+        },
+        verify=False)
     response.raise_for_status()
 
     response_json = response.json()
