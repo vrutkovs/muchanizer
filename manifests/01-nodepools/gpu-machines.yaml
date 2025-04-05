@@ -1,0 +1,24 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  name: vrutkovs-gzgvw-worker-us-east-2a
+  namespace: openshift-machine-api
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  template:
+    metadata:
+      labels:
+        node-role.kubernetes.io/gpu: ""
+    spec:
+      metadata:
+        labels:
+          node-role.kubernetes.io/gpu: ""
+      providerSpec:
+        value:
+          spotMarketOptions: {}
+          instanceType: g5.2xlarge
+      taints:
+        - key: nvidia.com/gpu
+          effect: NoSchedule
+          value: reserved

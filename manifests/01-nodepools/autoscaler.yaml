@@ -1,0 +1,15 @@
+apiVersion: autoscaling.openshift.io/v1
+kind: ClusterAutoscaler
+metadata:
+  name: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  balanceSimilarNodeGroups: true
+  podPriorityThreshold: -10
+  scaleDown:
+    enabled: true
+    delayAfterAdd: 5m
+    delayAfterDelete: 5m
+    delayAfterFailure: 5m
+    unneededTime: 60s

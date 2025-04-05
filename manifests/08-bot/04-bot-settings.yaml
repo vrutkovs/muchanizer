@@ -1,0 +1,10 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: settings
+  namespace: mirror-mirror
+stringData:
+  .env: |
+    VLLM_TOKEN = ""
+    VLLM_ENDPOINT = ""
+type: Opaque
