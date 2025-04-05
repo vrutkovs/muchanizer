@@ -13,13 +13,13 @@ from src import InferRequest
 import structlog
 log = structlog.get_logger()
 
-VLLM_ENDPOINT: Final = os.getenv("VLLM_ENDPOINT")
-if not VLLM_ENDPOINT:
-    raise Exception("VLLM_ENDPOINT not set")
+MODEL_ENDPOINT: Final = os.getenv("MODEL_ENDPOINT")
+if not MODEL_ENDPOINT:
+    raise Exception("MODEL_ENDPOINT not set")
 
-VLLM_TOKEN: Final = os.getenv("VLLM_TOKEN")
-if not VLLM_TOKEN:
-    raise Exception("VLLM_TOKEN not set")
+MODEL_TOKEN: Final = os.getenv("MODEL_TOKEN")
+if not MODEL_TOKEN:
+    raise Exception("MODEL_TOKEN not set")
 
 async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
     image_bytes = io.BytesIO()
@@ -38,26 +38,17 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
     )
     infer_request_json = json.dumps(infer_request)
     response = requests.post(
-        VLLM_ENDPOINT,
+        MODEL_ENDPOINT,
         data=infer_request_json,
         headers={
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {VLLM_TOKEN}",
+            "Authorization": f"Bearer {MODEL_TOKEN}",
         })
     response.raise_for_status()
 
     response_json = response.json()
-    if "predictions" not in response_json:
-        raise Exception(f"Unexpected response: {response_json}")
-    predictions = response_json["predictions"]
+    infer_response = response_json.loads(data, object_hook=lambda d: InferResponse(**d))
 
-    if len(predictions) == 0 or "image" not in predictions[0]:
-        raise Exception(f"Unexpected prediction in response: {predictions}")
-    response_image = predictions[0]["image"]
-
-    if "b64" not in response_image:
-        raise Exception(f"Unexpected image in response: {response_image}")
-
-    response_imgdata = base64.b64decode(response_image["b64"])
+    response_imgdata = base64.b64decode(infer_response.image_b64["b64"])
     response_image_obj = Image.open(io.BytesIO(response_imgdata))
     return response_image_obj

@@ -5,6 +5,7 @@ metadata:
   namespace: mirror-mirror
 stringData:
   .env: |
-    VLLM_TOKEN = ""
-    VLLM_ENDPOINT = ""
+    TELEGRAM_TOKEN = ""
+    MODEL_TOKEN = ""
+    MODEL_ENDPOINT = ""
 type: Opaque

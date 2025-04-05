@@ -12,7 +12,7 @@ try:
     from torch import Generator
     from kserve import Model, InferRequest, InferResponse
     from kserve.errors import InvalidInput
-    from diffusers import DiffusionPipeline, StableDiffusionPipeline
+    from diffusers import AutoPipelineForImage2Image
     from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
 except Exception as e:
     print(f"Caught Exception during library loading: {e}")
@@ -39,10 +39,10 @@ class DiffusersModel(Model):
         # detect accelerator
         device, dtype = get_accelerator_device()
         try:
-            pipeline = DiffusionPipeline.from_pretrained(self.model_id)
+            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id)
         except Exception:
             # try loading from a single file..
-            pipeline = StableDiffusionPipeline.from_single_file(self.model_id, torch_dtype=dtype, use_safetensors=True)
+            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, torch_dtype=dtype, use_safetensors=True)
 
         pipeline.to(device)
         self.pipeline = pipeline
@@ -56,6 +56,7 @@ class DiffusersModel(Model):
     #  {
     #    "instances": [
     #      {
+    #        "image_b64": "",
     #        "prompt": "a wizard smoking a pipe",
     #        "negative_prompt": "ugly, deformed, bad anatomy",
     #        "num_inference_steps": 20,

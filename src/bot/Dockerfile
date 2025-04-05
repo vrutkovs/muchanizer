@@ -14,4 +14,4 @@ FROM base
 COPY --from=builder /app /app
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8080
-CMD ["python", "/app/model.py"]
+CMD ["python", "/app/bot.py"]

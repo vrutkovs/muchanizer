@@ -17,7 +17,7 @@ log.info('Starting up bot...')
 
 load_dotenv(find_dotenv())
 
-TOKEN: Final = os.getenv('BOT_TOKEN')
+TOKEN: Final = os.getenv('TELEGRAM_TOKEN')
 if not TOKEN:
     log.info("Bot token is not set")
     sys.exit(1)
