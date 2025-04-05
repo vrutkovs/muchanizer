@@ -22,7 +22,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mirror-bot
+      app: mirror-mirror
   template:
     metadata:
       creationTimestamp: null
