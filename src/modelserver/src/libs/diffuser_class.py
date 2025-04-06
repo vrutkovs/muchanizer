@@ -25,6 +25,7 @@ torch._inductor.config.conv_1x1_as_mm = True
 torch._inductor.config.coordinate_descent_tuning = True
 torch._inductor.config.epilogue_fusion = False
 torch._inductor.config.coordinate_descent_check_all_directions = True
+torch.set_float32_matmul_precision('high')
 
 # stable diffusion class
 # instantiate this to perform image generation
