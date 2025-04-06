@@ -68,5 +68,4 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
         raise Exception("b64 not in image")
 
     response_imgdata = base64.b64decode(first_prediction["image"]["b64"])
-    response_image_obj = Image.open(io.BytesIO(response_imgdata))
-    return response_image_obj
+    return response_imgdata
