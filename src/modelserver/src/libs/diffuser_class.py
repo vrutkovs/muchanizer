@@ -159,9 +159,10 @@ class DiffusersModel(Model):
 
         # generate image
         print(f"Params: {payload}")
-        tensor = self.pipeline(**payload, denoising_end=0.8, output_type="latent").images
+        denoising = 0.8
+        tensor = self.pipeline(**payload, denoising_end=denoising, output_type="latent").images
         if self.refiner:
-            tensor = self.refiner(**payload, denoising_start=0.8, image=tensor[0]).images
+            tensor = self.refiner(**payload, denoising_start=denoising, image=tensor[0]).images
         # Convert tensor to PIL Image
         # image = pt_to_pil(tensor[0])
         image = tensor[0]
