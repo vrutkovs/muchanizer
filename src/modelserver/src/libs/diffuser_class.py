@@ -19,6 +19,13 @@ except Exception as e:
     print(f"Caught Exception during library loading: {e}")
     raise e
 
+# Torch tweaks
+import torch
+torch._inductor.config.conv_1x1_as_mm = True
+torch._inductor.config.coordinate_descent_tuning = True
+torch._inductor.config.epilogue_fusion = False
+torch._inductor.config.coordinate_descent_check_all_directions = True
+
 # stable diffusion class
 # instantiate this to perform image generation
 class DiffusersModel(Model):
@@ -61,8 +68,12 @@ class DiffusersModel(Model):
                 self.refiner = refiner.to(device)
 
         pipeline.enable_attention_slicing()
-        pipeline.unet = compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
+        pipeline.unet.to(memory_format=torch.channels_last)
+        pipeline.vae.to(memory_format=torch.channels_last)
+        pipeline.fuse_qkv_projections()
 
+        pipeline.unet = torch.compile(pipeline.unet, mode="max-autotune", fullgraph=True)
+        pipeline.vae.decode = torch.compile(pipeline.vae.decode, mode="max-autotune", fullgraph=True)
         pipeline.to(device)
 
         self.pipeline = pipeline
