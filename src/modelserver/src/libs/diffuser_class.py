@@ -43,6 +43,7 @@ class DiffusersModel(Model):
         self.device = None
         # refiner
         self.refiner_model = refiner_model
+        self.refiner = None
         # vae
         self.vae_model = vae_model
         # load model
