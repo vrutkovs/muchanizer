@@ -154,6 +154,7 @@ class DiffusersModel(Model):
         payload["image"] = image
 
         # generate image
+        print(f"Params: {payload}")
         tensor = self.pipeline(**payload, output_type="latent").images[0]
         if self.refiner:
             tensor = self.refiner(**payload, image=tensor).images[0]
