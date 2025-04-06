@@ -1,4 +1,3 @@
-from sched import scheduler
 from PIL import ImageFile, Image
 from typing import Final
 import requests
@@ -54,10 +53,20 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
         headers=HEADERS,
         verify=False)
     response.raise_for_status()
+    infer_response = response.json()
+    print(infer_response)
 
-    response_json = response.json()
-    infer_response = response_json.loads(response_json, object_hook=lambda d: InferResponse(**d))
+    if "predictions" not in infer_response:
+        raise Exception("predictions not in response")
+    predictions = infer_response["predictions"]
+    if len(predictions) == 0:
+        raise Exception("no predictions in response")
+    first_prediction = predictions[0]
+    if "image" not in first_prediction:
+        raise Exception("image not in prediction")
+    if "b64" not in first_prediction["image"]:
+        raise Exception("b64 not in image")
 
-    response_imgdata = base64.b64decode(infer_response.image_b64["b64"])
+    response_imgdata = base64.b64decode(first_prediction["image"]["b64"])
     response_image_obj = Image.open(io.BytesIO(response_imgdata))
     return response_image_obj
