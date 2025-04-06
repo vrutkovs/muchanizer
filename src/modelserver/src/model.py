@@ -29,11 +29,14 @@ if __name__ == "__main__":
 
         vae_model = os.environ.get("VAE_MODEL", None)
         if vae_model:
+            print(f"Downloading VAE model {vae_model}...")
             snapshot_download(repo_id=vae_model)
 
         refiner_model = os.environ.get("REFINER_MODEL", None)
         if refiner_model:
+            print(f"Downloading refiner model {refiner_model}...")
             snapshot_download(repo_id=refiner_model)
+        print("All models downloaded.")
 
     model = DiffusersModel(args.model_name)
     # start serving loop
