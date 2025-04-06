@@ -50,11 +50,13 @@ class DiffusersModel(Model):
             # try loading from a single file..
             vae = None
             if self.vae_model:
+                print(f"Loading VAE {self.vae_model}")
                 vae = AutoencoderKL.from_pretrained(self.vae_model, torch_dtype=dtype)
 
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True)
 
             if self.refiner_model:
+                print(f"Loading refiner {self.refiner_model}")
                 refiner = DiffusionPipeline.from_pretrained(self.refiner_model, torch_dtype=dtype, variant="fp16", use_safetensors=True)
                 self.refiner = refiner.to(device)
 
