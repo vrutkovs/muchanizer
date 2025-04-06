@@ -32,7 +32,7 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
 
     infer_request = InferRequest(
         image_b64=img_b64.decode("utf-8"),
-        prompt="detailed, Picasso, cubism",
+        prompt="art nouveau, Realistic detail, thick lines, 8k, Alphonse Mucha Style, vintage poster, alphonse mucha art style",
         negative_prompt="ugly, deformed, disfigured, poor details, bad anatomy",
         num_inference_steps=20,
         width=1024,
