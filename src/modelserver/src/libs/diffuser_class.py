@@ -37,14 +37,14 @@ class DiffusersModel(Model):
 
     # load weights and instantiate pipeline
     def load(self):
-        print(f"Loading model  {self.model_id}")
+        print(f"Loading model {self.model_id}")
         # detect accelerator
         device, dtype = get_accelerator_device()
         try:
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id)
         except Exception:
             # try loading from a single file..
-            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, torch_dtype=dtype, variant="fp16", use_safetensors=True)
+            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, torch_dtype=dtype, variant="fp16", use_safetensors=True, batch_size=10)
 
         pipeline.enable_attention_slicing()
 
