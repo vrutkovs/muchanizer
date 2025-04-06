@@ -68,7 +68,7 @@ async def generate_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
     new_image = await img2img_pipeline(image)
 
     await delete_file_from_drive(file)
-    await update.message.reply_image(new_image)
+    await update.message.reply_photo(new_image)
 
 
 if __name__ == '__main__':
