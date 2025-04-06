@@ -1,7 +1,7 @@
 apiVersion: machine.openshift.io/v1beta1
 kind: MachineSet
 metadata:
-  name: vrutkovs-gzgvw-worker-us-east-2a
+  name: vrutkovs-9m92r-worker-us-east-2a
   namespace: openshift-machine-api
   annotations:
     argocd.argoproj.io/sync-wave: "2"
@@ -17,7 +17,7 @@ spec:
       providerSpec:
         value:
           spotMarketOptions: {}
-          instanceType: g5.2xlarge
+          instanceType: g5.4xlarge
       taints:
         - key: nvidia.com/gpu
           effect: NoSchedule
