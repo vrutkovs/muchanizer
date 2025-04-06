@@ -33,9 +33,9 @@ class DiffusersModel(Model):
         # accelerator device
         self.device = None
         # refiner
-        self.refiner = refiner_model
+        self.refiner_model = refiner_model
         # vae
-        self.vae = vae_model
+        self.vae_model = vae_model
         # load model
         self.load()
 
@@ -49,14 +49,14 @@ class DiffusersModel(Model):
         except Exception:
             # try loading from a single file..
             vae = None
-            if self.vae:
-                vae = AutoencoderKL.from_pretrained(self.vae, torch_dtype=dtype)
+            if self.vae_model:
+                vae = AutoencoderKL.from_pretrained(self.vae_model, torch_dtype=dtype)
 
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True)
 
-            if self.refiner:
-                refiner = DiffusionPipeline.from_pretrained(self.refiner, torch_dtype=dtype, variant="fp16", use_safetensors=True)
-                refiner.to(device)
+            if self.refiner_model:
+                refiner = DiffusionPipeline.from_pretrained(self.refiner_model, torch_dtype=dtype, variant="fp16", use_safetensors=True)
+                self.refiner = refiner.to(device)
 
         pipeline.enable_attention_slicing()
         pipeline.unet = compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
@@ -123,7 +123,9 @@ class DiffusersModel(Model):
         payload["image"] = image
 
         # generate image
-        image = self.pipeline(**payload).images[0]
+        image = self.pipeline(**payload, output_type="latent").images
+        if self.refiner:
+            image = self.refiner(**payload, image=image).images[0]
 
         # convert images to PNG and encode in base64
         # for easy sending via response payload
