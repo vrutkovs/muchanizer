@@ -115,7 +115,10 @@ class DiffusersModel(Model):
             # malformed or missing input payload
             raise InvalidInput("invalid payload")
 
-        if not payload.get("instances", {}).get("image_b64"):
+        if len(payload["instances"]) == 0:
+            raise InvalidInput("invalid payload - empty instances")
+
+        if "image_b64" not in payload["instances"][0]:
             raise InvalidInput("invalid payload - image_b64 not set")
 
         # return generation data
