@@ -128,7 +128,7 @@ class DiffusersModel(Model):
     def predict(self, payload: Union[Dict, InferRequest], headers: Dict[str, str] = None) -> Union[Dict, InferResponse]:
         # generate images
         # set a fixed seed if necessary
-        if payload.get("seed") == -1:
+        if payload.get("seed", -1) == -1:
             payload["generator"] = Generator(self.device).manual_seed(random.getrandbits(RANDOM_BITS_LENGTH))
         else:
             payload["generator"] = Generator(self.device).manual_seed(payload.get("seed"))
