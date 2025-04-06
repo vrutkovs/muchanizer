@@ -39,6 +39,9 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
         height=512,
     )
     infer_request_json = json.dumps(infer_request, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+    print("---")
+    print(f"{infer_request_json}")
+    print("---")
     response = requests.post(
         MODEL_ENDPOINT,
         data=infer_request_json,
