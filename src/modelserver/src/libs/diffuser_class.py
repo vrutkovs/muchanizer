@@ -7,18 +7,15 @@ import io
 from typing import Dict, Union
 
 # import libraries
-try:
-    import random
-    from torch import Generator, channels_last, compile
-    from kserve import Model, InferRequest, InferResponse
-    from kserve.errors import InvalidInput
-    from diffusers import AutoPipelineForImage2Image, AutoencoderKL
-    from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
-    from PIL import Image
-    from diffusers.utils import pt_to_pil
-except Exception as e:
-    print(f"Caught Exception during library loading: {e}")
-    raise e
+import random
+from torch import Generator
+from kserve import Model, InferRequest, InferResponse
+from kserve.errors import InvalidInput
+from diffusers.models.autoencoders.autoencoder_kl import AutoencoderKL
+from diffusers.pipelines.auto_pipeline import AutoPipelineForImage2Image
+from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
+from PIL import Image
+# from diffusers.utils.pil_utils import pt_to_pil
 
 # Torch tweaks
 import torch
@@ -149,9 +146,10 @@ class DiffusersModel(Model):
 
         # generate image
         print(f"Params: {payload}")
-        tensor = self.pipeline(**payload, strength=0.75).images
+        tensor = self.pipeline(**payload).images
         # Convert tensor to PIL Image
-        image = pt_to_pil(tensor[0])
+        # image = pt_to_pil(tensor[0])
+        image = tensor[0]
 
         # convert images to PNG and encode in base64
         # for easy sending via response payload
