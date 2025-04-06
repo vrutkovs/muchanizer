@@ -151,9 +151,9 @@ class DiffusersModel(Model):
         payload["image"] = image
 
         # generate image
-        image = self.pipeline(**payload, output_type="latent").images
-        if self.refiner:
-            image = self.refiner(**payload, image=image).images[0]
+        image = self.pipeline(**payload, output_type="latent").images[0]
+        # if self.refiner:
+        #     image = self.refiner(**payload, image=image).images[0]
 
         # convert images to PNG and encode in base64
         # for easy sending via response payload
