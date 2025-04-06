@@ -62,11 +62,11 @@ class DiffusersModel(Model):
                 print(f"Loading VAE {self.vae_model}")
                 vae = AutoencoderKL.from_pretrained(self.vae_model, torch_dtype=dtype)
 
-            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
+            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True)
 
             if self.refiner_model:
                 print(f"Loading refiner {self.refiner_model}")
-                refiner = DiffusionPipeline.from_pretrained(self.refiner_model, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
+                refiner = DiffusionPipeline.from_pretrained(self.refiner_model, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True)
                 self.refiner = refiner.to(device)
 
         pipeline.enable_attention_slicing()
