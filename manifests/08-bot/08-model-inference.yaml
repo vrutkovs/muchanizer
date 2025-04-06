@@ -23,12 +23,12 @@ spec:
         image: "image-registry.openshift-image-registry.svc:5000/mirror-mirror/mirror-mirror:model"
         resources:
           limits:
-            cpu: "10"
+            cpu: "8"
             memory: 30Gi
             nvidia.com/gpu: "1"
           requests:
-            cpu: "6"
-            memory: 24Gi
+            cpu: "1"
+            memory: 8Gi
             nvidia.com/gpu: "1"
         env:
           - name: MODEL_ID
