@@ -63,6 +63,11 @@ class DiffusersModel(Model):
 
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True)
 
+            if self.refiner_model:
+                print(f"Loading refiner {self.refiner_model}")
+                self.refiner = AutoPipelineForImage2Image.from_pretrained(self.refiner_model, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2)
+                self.refiner.to(device)
+
         pipeline.enable_attention_slicing()
         pipeline.unet.to(memory_format=torch.channels_last)
         pipeline.vae.to(memory_format=torch.channels_last)
@@ -147,7 +152,9 @@ class DiffusersModel(Model):
 
         # generate image
         print(f"Params: {payload}")
-        tensor = self.pipeline(**payload).images
+        tensor = self.pipeline(**payload, denoising_end=0.8, output_type="latent").images
+        if self.refiner:
+            tensor = self.refiner(**payload, denoising_start=0.8, image=tensor).images[0]
         # Convert tensor to PIL Image
         # image = pt_to_pil(tensor[0])
         image = tensor[0]
