@@ -12,7 +12,7 @@ try:
     from torch import Generator, channels_last, compile
     from kserve import Model, InferRequest, InferResponse
     from kserve.errors import InvalidInput
-    from diffusers import AutoPipelineForImage2Image, DiffusionPipeline, AutoencoderKL
+    from diffusers import AutoPipelineForImage2Image, AutoPipelineForImage2Image, AutoencoderKL
     from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
     from PIL import Image
 except Exception as e:
@@ -67,7 +67,7 @@ class DiffusersModel(Model):
 
             if self.refiner_model:
                 print(f"Loading refiner {self.refiner_model}")
-                self.refiner = DiffusionPipeline.from_pretrained(self.refiner_model, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True)
+                self.refiner = AutoPipelineForImage2Image.from_pretrained(self.refiner_model, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True)
                 self.refiner.to(device)
 
         pipeline.enable_attention_slicing()
@@ -79,8 +79,9 @@ class DiffusersModel(Model):
         # pipeline.unet = torch.compile(pipeline.unet, mode="max-autotune", fullgraph=True)
         # pipeline.vae.decode = torch.compile(pipeline.vae.decode, mode="max-autotune", fullgraph=True)
 
-        pipeline.unet = torch.compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
-        pipeline.vae.decode = torch.compile(pipeline.vae.decode, mode="reduce-overhead", fullgraph=True)
+        # Reduce overhead
+        # pipeline.unet = torch.compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
+        # pipeline.vae.decode = torch.compile(pipeline.vae.decode, mode="reduce-overhead", fullgraph=True)
 
         pipeline.to(device)
 
