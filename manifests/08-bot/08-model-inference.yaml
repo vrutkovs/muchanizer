@@ -32,7 +32,9 @@ spec:
             nvidia.com/gpu: "1"
         env:
           - name: MODEL_ID
-            value: "kandinsky-community/kandinsky-3"
+            value: "stabilityai/stable-diffusion-3-medium-diffusers"
+          - name: HF_TOKEN
+            value: "foobar"
         volumeMounts:
           - mountPath: /opt/app-root/src/.cache
             name: hg-cache

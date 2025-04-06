@@ -47,9 +47,6 @@ class DiffusersModel(Model):
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, torch_dtype=dtype, variant="fp16", use_safetensors=True, batch_size=10)
 
         pipeline.enable_attention_slicing()
-
-        # Kandinsky tricks
-        pipeline.unet.to(memory_format=channels_last)
         pipeline.unet = compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
 
         pipeline.to(device)
