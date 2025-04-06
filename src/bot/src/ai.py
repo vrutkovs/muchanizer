@@ -34,7 +34,7 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
         image_b64=str(img_b64),
         prompt="cat wizard, gandalf, lord of the rings, detailed, fantasy, cute, adorable, Pixar, Disney, 8k",
         negative_prompt="ugly, deformed, disfigured, poor details, bad anatomy",
-        num_inference_steps=5,
+        num_inference_steps=20,
         width=512,
         height=512,
     )
