@@ -32,7 +32,7 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
 
     infer_request = InferRequest(
         image_b64=img_b64.decode("utf-8"),
-        prompt="cat wizard, gandalf, lord of the rings, detailed, fantasy, cute, adorable, Pixar, Disney, 8k",
+        prompt="detailed, Picasso, cubism",
         negative_prompt="ugly, deformed, disfigured, poor details, bad anatomy",
         num_inference_steps=20,
         width=1024,
