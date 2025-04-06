@@ -38,7 +38,11 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
         width=512,
         height=512,
     )
-    infer_request_json = json.dumps(infer_request, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+    infer_request_json = json.dumps(
+        {"instances": [infer_request]},
+        default=lambda o: o.__dict__,
+        sort_keys=True,
+        indent=4)
     print("---")
     print(f"{infer_request_json}")
     print("---")
