@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
         print("All models downloaded.")
 
-    model = DiffusersModel(args.model_name, refiner_model, vae_model, lora_model, lora_weight_name)
+    model = DiffusersModel(args.model_name)
     # start serving loop
     try:
         ModelServer().start([model])

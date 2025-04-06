@@ -40,13 +40,13 @@ class DiffusersModel(Model):
         # accelerator device
         self.device = None
         # refiner
-        self.refiner_model = refiner_model
+        self.refiner_model = os.environ.get("REFINER_MODEL", None)
         self.refiner = None
         # vae
-        self.vae_model = vae_model
+        self.vae_model = os.environ.get("VAE_MODEL", None)
         # lora
-        self.lora_model = lora_model
-        self.lora_weight_name = lora_weight_name
+        self.lora_model = os.environ.get("LORA_MODEL", None)
+        self.lora_weight_name = os.environ.get("LORA_WEIGHT_NAME", None)
         # load model
         self.load()
 
