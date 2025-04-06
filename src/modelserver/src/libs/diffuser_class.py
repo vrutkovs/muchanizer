@@ -64,7 +64,7 @@ class DiffusersModel(Model):
 
             if self.refiner_model:
                 print(f"Loading refiner {self.refiner_model}")
-                refiner = DiffusionPipeline.from_pretrained(self.refiner_model, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
+                refiner = DiffusionPipeline.from_pretrained(self.refiner_model, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
                 self.refiner = refiner.to(device)
 
         pipeline.enable_attention_slicing()
