@@ -36,8 +36,6 @@ if __name__ == "__main__":
             snapshot_download(repo_id=refiner_model)
 
     model = DiffusersModel(args.model_name)
-    # load model from disk
-    model.load()
     # start serving loop
     try:
         ModelServer().start([model])
