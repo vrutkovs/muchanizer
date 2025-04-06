@@ -1,3 +1,4 @@
+from sched import scheduler
 from PIL import ImageFile, Image
 from typing import Final
 import requests
@@ -37,6 +38,7 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
         num_inference_steps=20,
         width=512,
         height=512,
+        scheduler="DPM++ SDE",
     )
     infer_request_json = json.dumps(
         {"instances": [infer_request]},
