@@ -3,7 +3,7 @@
 # import base libraries
 import argparse
 import os
-from huggingface_hub import snapshot_download, login
+from huggingface_hub import snapshot_download
 
 # import custom diffuser class
 # also import kserve libraries

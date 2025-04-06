@@ -84,6 +84,7 @@ class DiffusersModel(Model):
         # set to True when model is loaded successfully without exceptions.
         print("Loading complete")
         self.ready = True
+        return True
 
     # process incoming request payload.
     # An example JSON payload:
@@ -127,7 +128,7 @@ class DiffusersModel(Model):
         return payload["instances"][0]
 
     # perform a forward pass (inference) and return generated data
-    def predict(self, payload: Union[Dict, InferRequest], headers: Dict[str, str] = None) -> Union[Dict, InferResponse]:
+    def predict(self, payload: Union[Dict, InferRequest], headers: Dict[str, str] = None, response_headers: Dict[str, str] = None,) -> Union[Dict, InferResponse]:
         # generate images
         # set a fixed seed if necessary
         if payload.get("seed", -1) == -1:
