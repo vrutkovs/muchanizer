@@ -32,7 +32,11 @@ spec:
             nvidia.com/gpu: "1"
         env:
           - name: MODEL_ID
-            value: "stabilityai/stable-diffusion-3-medium-diffusers"
+            value: "stabilityai/stable-diffusion-xl-base-1.0"
+          - name: VAE_MODEL
+            value: "madebyollin/sdxl-vae-fp16-fix"
+          - name: REFINER_MODEL
+            value: "stabilityai/stable-diffusion-xl-refiner-1.0"
           - name: HF_TOKEN
             value: "foobar"
         volumeMounts:

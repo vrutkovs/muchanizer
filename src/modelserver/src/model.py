@@ -28,6 +28,14 @@ if __name__ == "__main__":
             login(token=token)
         snapshot_download(repo_id=args.model_name)
 
+        vae_model = os.environ.get("VAE_MODEL", None)
+        if vae_model:
+            snapshot_download(repo_id=vae_model)
+
+        refiner_model = os.environ.get("REFINER_MODEL", None)
+        if refiner_model:
+            snapshot_download(repo_id=refiner_model)
+
     model = DiffusersModel(args.model_name)
     # load model from disk
     model.load()

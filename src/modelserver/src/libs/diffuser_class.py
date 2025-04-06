@@ -12,7 +12,7 @@ try:
     from torch import Generator, channels_last, compile
     from kserve import Model, InferRequest, InferResponse
     from kserve.errors import InvalidInput
-    from diffusers import AutoPipelineForImage2Image
+    from diffusers import AutoPipelineForImage2Image, DiffusionPipeline, AutoencoderKL
     from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
     from PIL import Image
 except Exception as e:
@@ -23,7 +23,7 @@ except Exception as e:
 # instantiate this to perform image generation
 class DiffusersModel(Model):
     # initialize class
-    def __init__(self, name: str):
+    def __init__(self, name: str, refiner_model: str | None = None, vae_model: str | None = None):
         super().__init__(name)
         self.model_id = os.environ.get("MODEL_ID", default="/mnt/models")
         # stable diffusion pipeline
@@ -32,6 +32,10 @@ class DiffusersModel(Model):
         self.ready = False
         # accelerator device
         self.device = None
+        # refiner
+        self.refiner = refiner_model
+        # vae
+        self.vae = vae_model
         # load model
         self.load()
 
@@ -44,7 +48,15 @@ class DiffusersModel(Model):
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id)
         except Exception:
             # try loading from a single file..
-            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, torch_dtype=dtype, variant="fp16", use_safetensors=True, batch_size=10)
+            vae = None
+            if self.vae:
+                vae = AutoencoderKL.from_pretrained(self.vae, torch_dtype=dtype)
+
+            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True)
+
+            if self.refiner:
+                refiner = DiffusionPipeline.from_pretrained(self.refiner, torch_dtype=dtype, variant="fp16", use_safetensors=True)
+                refiner.to(device)
 
         pipeline.enable_attention_slicing()
         pipeline.unet = compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
