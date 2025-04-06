@@ -15,8 +15,7 @@ try:
     from diffusers import AutoPipelineForImage2Image, AutoencoderKL
     from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
     from PIL import Image
-    import torchvision.transforms as T
-    transform = T.ToPILImage()
+    from diffusers.utils import pt_to_pil
 except Exception as e:
     print(f"Caught Exception during library loading: {e}")
     raise e
@@ -159,7 +158,7 @@ class DiffusersModel(Model):
         if self.refiner:
             tensor = self.refiner(**payload, denoising_start=0.8, image=tensor).images[0]
         # Convert tensor to PIL Image
-        image = transform(tensor)
+        image = pt_to_pil(tensor[0])
 
         # convert images to PNG and encode in base64
         # for easy sending via response payload
