@@ -36,6 +36,12 @@ if __name__ == "__main__":
         if refiner_model:
             print(f"Downloading refiner model {refiner_model}...")
             snapshot_download(repo_id=refiner_model)
+
+        lora_model = os.environ.get("LORA_MODEL", None)
+        if lora_model:
+            print(f"Downloading lora model {lora_model}...")
+            snapshot_download(repo_id=lora_model)
+
         print("All models downloaded.")
 
     model = DiffusersModel(args.model_name)

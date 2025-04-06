@@ -30,7 +30,7 @@ torch.backends.cuda.matmul.allow_tf32 = True
 # instantiate this to perform image generation
 class DiffusersModel(Model):
     # initialize class
-    def __init__(self, name: str, refiner_model: str | None = None, vae_model: str | None = None):
+    def __init__(self, name: str, refiner_model: str | None = None, vae_model: str | None = None, lora_model: str | None = None):
         super().__init__(name)
         self.model_id = os.environ.get("MODEL_ID", default="/mnt/models")
         # stable diffusion pipeline
@@ -44,6 +44,8 @@ class DiffusersModel(Model):
         self.refiner = None
         # vae
         self.vae_model = vae_model
+        # lora
+        self.lora_model = lora_model
         # load model
         self.load()
 
@@ -62,6 +64,10 @@ class DiffusersModel(Model):
                 vae = AutoencoderKL.from_pretrained(self.vae_model, torch_dtype=dtype)
 
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True)
+
+            if self.lora_model:
+                print(f"Loading LoRA {self.lora_model}")
+                pipeline.load_lora_weights(self.lora_model)
 
             if self.refiner_model:
                 print(f"Loading refiner {self.refiner_model}")

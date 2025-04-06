@@ -37,6 +37,8 @@ spec:
             value: "madebyollin/sdxl-vae-fp16-fix"
           - name: REFINER_MODEL
             value: "stabilityai/stable-diffusion-xl-refiner-1.0"
+          - name: LORA_MODEL
+            value: "KappaNeuro/alphonse-mucha-style"
           - name: HF_TOKEN
             value: "foobar"
         volumeMounts:
