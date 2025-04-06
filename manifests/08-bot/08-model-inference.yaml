@@ -39,6 +39,8 @@ spec:
             value: "stabilityai/stable-diffusion-xl-refiner-1.0"
           - name: LORA_MODEL
             value: "KappaNeuro/alphonse-mucha-style"
+          - name: LORA_WEIGHT_NAME
+            value: "Alphonse Mucha Style.safetensors"
           - name: HF_TOKEN
             value: "foobar"
         volumeMounts:
