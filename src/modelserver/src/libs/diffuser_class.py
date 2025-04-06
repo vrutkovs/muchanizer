@@ -12,7 +12,7 @@ try:
     from torch import Generator, channels_last, compile
     from kserve import Model, InferRequest, InferResponse
     from kserve.errors import InvalidInput
-    from diffusers import AutoPipelineForImage2Image, AutoPipelineForImage2Image, AutoencoderKL
+    from diffusers import AutoPipelineForImage2Image, AutoencoderKL
     from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
     from PIL import Image
 except Exception as e:
