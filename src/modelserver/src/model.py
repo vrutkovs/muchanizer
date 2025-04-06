@@ -3,7 +3,7 @@
 # import base libraries
 import argparse
 import os
-from huggingface_hub import snapshot_download
+from huggingface_hub import snapshot_download, login
 
 # import custom diffuser class
 # also import kserve libraries
@@ -23,6 +23,9 @@ if __name__ == "__main__":
     # Try to download the model if it doesn't exist
     if not os.path.exists(args.model_name):
         print(f"Downloading model {args.model_name}...")
+        token = os.environ.get("HF_TOKEN", None)
+        if token:
+            login(token=token)
         snapshot_download(repo_id=args.model_name)
 
     model = DiffusersModel(args.model_name)
