@@ -102,6 +102,10 @@ class DiffusersModel(Model):
     #  }
     # validate input request: v2 payloads not yet supported
     def preprocess(self, payload: Union[Dict, InferRequest], headers: Dict[str, str] = None) -> Dict:
+        print("payload:")
+        print(payload)
+        print("---")
+
         if isinstance(payload, Dict) and "instances" in payload:
             headers["request-type"] = "v1"
         # KServe InferRequest not yet supported
