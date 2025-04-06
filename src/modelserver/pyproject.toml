@@ -12,6 +12,7 @@ dependencies = [
     "transformers>=4.50.3",
     "accelerate>=1.6.0",
     "sentencepiece>=0.2.0",
+    "huggingface-hub>=0.30.1",
 ]
 
 [[tool.uv.index]]

@@ -2,6 +2,8 @@
 
 # import base libraries
 import argparse
+import os
+from huggingface_hub import snapshot_download
 
 # import custom diffuser class
 # also import kserve libraries
@@ -18,6 +20,11 @@ args, _ = parser.parse_known_args()
 
 # start serving
 if __name__ == "__main__":
+    # Try to download the model if it doesn't exist
+    if not os.path.exists(args.model_name):
+        print(f"Downloading model {args.model_name}...")
+        snapshot_download(repo_id=args.model_name)
+
     model = DiffusersModel(args.model_name)
     # load model from disk
     model.load()
