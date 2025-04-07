@@ -62,16 +62,19 @@ class DiffusersModel(Model):
         # detect accelerator
         device, dtype = get_accelerator_device()
 
-        vae = None
+        pipeline_args = {
+        }
         if self.vae_model:
             print(f"Loading VAE {self.vae_model}")
             vae = AutoencoderKL.from_pretrained(self.vae_model, torch_dtype=dtype)
+            pipeline_args["vae"] = vae
+
 
         try:
-            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, vae=vae)
+            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, **pipeline_args)
         except Exception:
             # try loading from a single file..
-            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True)
+            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True)
 
         if self.lora_model :
             print(f"Loading LoRA {self.lora_model}")
@@ -79,12 +82,13 @@ class DiffusersModel(Model):
 
         if self.refiner_model:
             print(f"Loading refiner {self.refiner_model}")
-            self.refiner = AutoPipelineForImage2Image.from_pretrained(self.refiner_model, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2)
+            self.refiner = AutoPipelineForImage2Image.from_pretrained(self.refiner_model, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2)
             self.refiner.to(device)
 
         pipeline.enable_attention_slicing()
         pipeline.unet.to(memory_format=torch.channels_last)
-        pipeline.vae.to(memory_format=torch.channels_last)
+        if "vae" in pipeline.components:
+            pipeline.vae.to(memory_format=torch.channels_last)
         pipeline.fuse_qkv_projections()
 
         # Max autotune
