@@ -1,3 +1,4 @@
+from statistics import mode
 #!/usr/bin/env python
 
 # base libs
@@ -75,9 +76,18 @@ class DiffusersModel(Model):
             # try loading from a single file..
             pipeline = StableDiffusionXLImg2ImgPipeline.from_pretrained(self.model_id, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
 
+        lora_noise_loaded = False
+
+        if self.model_id == "stabilityai/stable-diffusion-xl-base-1.0":
+            print("Loading Stable Diffusion XL offset noise LoRA")
+            lora_noise_loaded = True
+            pipeline.load_lora_weights(self.model_id, weight_name="sd_xl_offset_example-lora_1.0.safetensors", adapter_name="offset_noise")
+
         if self.lora_model:
             print(f"Loading LoRA {self.lora_model} ({self.lora_weight_name})")
             pipeline.load_lora_weights(self.lora_model, weight_name=self.lora_weight_name, adapter_name="custom_lora")
+            if lora_noise_loaded:
+                pipeline.set_adapters(["offset_noise", "custom_lora"], adapter_weights=[0.7, 0.8])
 
         if self.refiner_model:
             print(f"Loading refiner {self.refiner_model}")
@@ -89,7 +99,10 @@ class DiffusersModel(Model):
             pipeline.vae.to(memory_format=torch.channels_last)
         pipeline.fuse_qkv_projections()
         pipeline.enable_model_cpu_offload()
-        pipeline.enable_freeu(s1=0.9, s2=0.2, b1=1.3, b2=1.4)
+
+        # FreeU
+        # pipeline.enable_freeu(s1=0.9, s2=0.2, b1=1.3, b2=1.4)
+
         # Max autotune
         # pipeline.unet = torch.compile(pipeline.unet, mode="max-autotune", fullgraph=True)
         # pipeline.vae.decode = torch.compile(pipeline.vae.decode, mode="max-autotune", fullgraph=True)
