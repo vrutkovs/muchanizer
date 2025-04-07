@@ -22,6 +22,8 @@ if not TOKEN:
     log.info("Bot token is not set")
     sys.exit(1)
 
+DEFAULT_PROMPT = """Alphonse Mucha Style - Draw inspiration from Alphonse Mucha's art style, characterized by flowing lines, intricate patterns, and decorative motifs. Include elements like delicate floral patterns, ethereal hair adorned with flowers or jewels, and ornate accessories to enhance the royal aesthetic. Intense Mucha style background. Thick Lines, high-contrast, high-resolution high definition in details and ink outlines, no shading, intricate detailed frame border"""
+
 async def start_command(update: Update, context:ContextTypes.DEFAULT_TYPE):
     if not update.message:
         return
@@ -67,7 +69,7 @@ async def generate_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.caption:
         prompt = update.message.caption
     else:
-        prompt = "art nouveau, Realistic detail, thick lines, 8k, Alphonse Mucha Style, vintage poster, alphonse mucha art style"
+        prompt = DEFAULT_PROMPT
     new_image = await img2img_pipeline(image, prompt)
 
     await delete_file_from_drive(file)
