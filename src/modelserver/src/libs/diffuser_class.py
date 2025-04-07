@@ -69,7 +69,6 @@ class DiffusersModel(Model):
             vae = AutoencoderKL.from_pretrained(self.vae_model, torch_dtype=dtype)
             pipeline_args["vae"] = vae
 
-
         try:
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, **pipeline_args)
         except Exception:
@@ -176,10 +175,13 @@ class DiffusersModel(Model):
         #     tensor = self.refiner(**payload, denoising_start=denoising, image=tensor[0]).images
         # Convert tensor to PIL Image
         # image = pt_to_pil(tensor[0])
-        tensor = self.pipeline(**payload).images
-        if self.refiner:
-            tensor = self.refiner(**payload, denoising_start=denoising, image=tensor).images
-        image = tensor[0]
+        result = None
+        device, dtype = get_accelerator_device()
+        with torch.autocast(device):
+            tensor = self.pipeline(**payload).images
+            if self.refiner:
+                tensor = self.refiner(**payload, denoising_start=denoising, image=tensor).images
+            result = tensor[0]
 
         # convert images to PNG and encode in base64
         # for easy sending via response payload
