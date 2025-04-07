@@ -75,7 +75,7 @@ class DiffusersModel(Model):
             # try loading from a single file..
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True)
 
-        if self.lora_model :
+        if self.lora_model:
             print(f"Loading LoRA {self.lora_model}")
             pipeline.load_lora_weights(self.lora_model, weight_name=self.lora_weight_name)
 
@@ -166,6 +166,9 @@ class DiffusersModel(Model):
         image_b64 = payload.get("image_b64")
         image = Image.open(io.BytesIO(base64.b64decode(image_b64)))
         payload["image"] = image
+
+        if self.lora_model:
+            payload["cross_attention_kwargs"] = {"scale": 0.9}
 
         # generate image
         print(f"Params: {payload}")
