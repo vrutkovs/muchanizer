@@ -10,8 +10,6 @@ stringData:
     MODEL_ENDPOINT = ""
   HF_TOKEN: foobar
   MODEL_ID: "stabilityai/stable-diffusion-xl-base-1.0"
-  VAE_MODEL: "madebyollin/sdxl-vae-fp16-fix"
-  REFINER_MODEL: "stabilityai/stable-diffusion-xl-refiner-1.0"
   LORA_MODEL: "KappaNeuro/alphonse-mucha-style"
   LORA_WEIGHT_NAME: "Alphonse Mucha Style.safetensors"
 type: Opaque

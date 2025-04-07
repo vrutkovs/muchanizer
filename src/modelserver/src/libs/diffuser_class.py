@@ -88,6 +88,7 @@ class DiffusersModel(Model):
         if "vae" in pipeline.components:
             pipeline.vae.to(memory_format=torch.channels_last)
         pipeline.fuse_qkv_projections()
+        pipeline.enable_model_cpu_offload()
 
         # Max autotune
         # pipeline.unet = torch.compile(pipeline.unet, mode="max-autotune", fullgraph=True)
@@ -176,16 +177,14 @@ class DiffusersModel(Model):
         # Convert tensor to PIL Image
         # image = pt_to_pil(tensor[0])
         result = None
-        device, dtype = get_accelerator_device()
-        with torch.autocast(device):
-            if self.refiner:
-                payload["denoising_end"] = denoising
-                payload["output_type"] = "latent"
-            tensor = self.pipeline(**payload).images
-            if self.refiner:
-                del payload["denoising_end"]
-                tensor = self.refiner(**payload, denoising_start=denoising, image=tensor).images
-            result = tensor[0]
+        if self.refiner:
+            payload["denoising_end"] = denoising
+            payload["output_type"] = "latent"
+        tensor = self.pipeline(**payload).images
+        if self.refiner:
+            del payload["denoising_end"]
+            tensor = self.refiner(**payload, denoising_start=denoising, image=tensor).images
+        result = tensor[0]
 
         # convert images to PNG and encode in base64
         # for easy sending via response payload
