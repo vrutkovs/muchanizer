@@ -89,7 +89,7 @@ class DiffusersModel(Model):
             pipeline.vae.to(memory_format=torch.channels_last)
         pipeline.fuse_qkv_projections()
         pipeline.enable_model_cpu_offload()
-
+        pipeline.enable_freeu(s1=0.9, s2=0.2, b1=1.3, b2=1.4)
         # Max autotune
         # pipeline.unet = torch.compile(pipeline.unet, mode="max-autotune", fullgraph=True)
         # pipeline.vae.decode = torch.compile(pipeline.vae.decode, mode="max-autotune", fullgraph=True)
