@@ -47,6 +47,12 @@ class DiffusersModel(Model):
         # lora
         self.lora_model = os.environ.get("LORA_MODEL", None)
         self.lora_weight_name = os.environ.get("LORA_WEIGHT_NAME", None)
+
+        print(f"Refiner: {self.refiner_model}")
+        print(f"VAE: {self.vae_model}")
+        print(f"Lora model: {self.lora_model}")
+        print(f"Lora weight name: {self.lora_weight_name}")
+
         # load model
         self.load()
 
@@ -55,25 +61,26 @@ class DiffusersModel(Model):
         print(f"Loading model {self.model_id}")
         # detect accelerator
         device, dtype = get_accelerator_device()
+
+        vae = None
+        if self.vae_model:
+            print(f"Loading VAE {self.vae_model}")
+            vae = AutoencoderKL.from_pretrained(self.vae_model, torch_dtype=dtype)
+
         try:
-            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id)
+            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, vae=vae)
         except Exception:
             # try loading from a single file..
-            vae = None
-            if self.vae_model:
-                print(f"Loading VAE {self.vae_model}")
-                vae = AutoencoderKL.from_pretrained(self.vae_model, torch_dtype=dtype)
-
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True)
 
-            if self.lora_model :
-                print(f"Loading LoRA {self.lora_model}")
-                pipeline.load_lora_weights(self.lora_model, weight_name=self.lora_weight_name)
+        if self.lora_model :
+            print(f"Loading LoRA {self.lora_model}")
+            pipeline.load_lora_weights(self.lora_model, weight_name=self.lora_weight_name)
 
-            if self.refiner_model:
-                print(f"Loading refiner {self.refiner_model}")
-                self.refiner = AutoPipelineForImage2Image.from_pretrained(self.refiner_model, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2)
-                self.refiner.to(device)
+        if self.refiner_model:
+            print(f"Loading refiner {self.refiner_model}")
+            self.refiner = AutoPipelineForImage2Image.from_pretrained(self.refiner_model, vae=vae, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2)
+            self.refiner.to(device)
 
         pipeline.enable_attention_slicing()
         pipeline.unet.to(memory_format=torch.channels_last)
@@ -160,11 +167,14 @@ class DiffusersModel(Model):
         # generate image
         print(f"Params: {payload}")
         denoising = 0.8
-        tensor = self.pipeline(**payload, denoising_end=denoising, output_type="latent").images
-        if self.refiner:
-            tensor = self.refiner(**payload, denoising_start=denoising, image=tensor[0]).images
+        #tensor = self.pipeline(**payload, denoising_end=denoising, output_type="latent").images
+        # if self.refiner:
+        #     tensor = self.refiner(**payload, denoising_start=denoising, image=tensor[0]).images
         # Convert tensor to PIL Image
         # image = pt_to_pil(tensor[0])
+        tensor = self.pipeline(**payload).images
+        if self.refiner:
+            tensor = self.refiner(**payload, denoising_start=denoising, image=tensor).images
         image = tensor[0]
 
         # convert images to PNG and encode in base64

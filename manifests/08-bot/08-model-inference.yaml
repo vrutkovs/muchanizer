@@ -21,6 +21,15 @@ spec:
     containers:
       - name: kserve-container
         image: "image-registry.openshift-image-registry.svc:5000/mirror-mirror/mirror-mirror:model"
+        command:
+          - bash
+          - "-c"
+          - "huggingface-cli download ${MODEL_ID} && \
+            huggingface-cli download ${VAE_MODEL} && \
+            huggingface-cli download ${REFINER_MODEL} && \
+            huggingface-cli download ${LORA_MODEL} && \
+            source /app/.venv/bin/activate && \
+            exec python /app/model.py"
         resources:
           limits:
             cpu: "8"
@@ -30,19 +39,9 @@ spec:
             cpu: "1"
             memory: 8Gi
             nvidia.com/gpu: "1"
-        env:
-          - name: MODEL_ID
-            value: "stabilityai/stable-diffusion-xl-base-1.0"
-          - name: VAE_MODEL
-            value: "madebyollin/sdxl-vae-fp16-fix"
-          - name: REFINER_MODEL
-            value: "stabilityai/stable-diffusion-xl-refiner-1.0"
-          - name: LORA_MODEL
-            value: "KappaNeuro/alphonse-mucha-style"
-          - name: LORA_WEIGHT_NAME
-            value: "Alphonse Mucha Style.safetensors"
-          - name: HF_TOKEN
-            value: "foobar"
+        envFrom:
+          - secretRef:
+              name: settings
         volumeMounts:
           - mountPath: /opt/app-root/src/.cache
             name: hg-cache
@@ -54,3 +53,7 @@ spec:
       - persistentVolumeClaim:
           claimName: hg-cache
         name: hg-cache
+      - name: settings
+        secret:
+          secretName: settings
+          defaultMode: 420
