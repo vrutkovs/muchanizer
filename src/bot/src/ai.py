@@ -1,4 +1,4 @@
-from PIL import ImageFile, Image
+from PIL import Image, ImageFile
 from typing import Final
 import requests
 import os
@@ -24,7 +24,7 @@ HEADERS = {
 if MODEL_TOKEN:
     HEADERS["Authorization"] = f"Bearer {MODEL_TOKEN}"
 
-async def img2img_pipeline(image: ImageFile.ImageFile, prompt: str) -> ImageFile.ImageFile:
+async def img2img_pipeline(image: Image.Image, prompt: str) -> ImageFile.ImageFile:
     image_bytes = io.BytesIO()
     image.save(image_bytes, format='PNG')
     image_bytes.seek(0)

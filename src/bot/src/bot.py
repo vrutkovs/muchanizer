@@ -70,11 +70,26 @@ async def generate_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
         prompt = update.message.caption
     else:
         prompt = DEFAULT_PROMPT
-    new_image = await img2img_pipeline(image, prompt)
+
+    resized_original = scale_and_paste(image)
+    new_image = await img2img_pipeline(resized_original, prompt)
 
     await delete_file_from_drive(file)
     await update.message.reply_photo(new_image)
 
+
+def scale_and_paste(original_image):
+    aspect_ratio = original_image.width / original_image.height
+
+    if original_image.width > original_image.height:
+        new_width = 1024
+        new_height = round(new_width / aspect_ratio)
+    else:
+        new_height = 1024
+        new_width = round(new_height * aspect_ratio)
+
+    resized_original = original_image.resize((new_width, new_height), Image.LANCZOS)
+    return resized_original
 
 if __name__ == '__main__':
     app = Application.builder().token(TOKEN).build()
