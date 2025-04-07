@@ -189,7 +189,7 @@ class DiffusersModel(Model):
         # convert images to PNG and encode in base64
         # for easy sending via response payload
         image_bytes = io.BytesIO()
-        image.save(image_bytes, format='PNG')
+        result.save(image_bytes, format='PNG')
         image_bytes.seek(0)
         # base64 encoding
         im_b64 = base64.b64encode(image_bytes.read())
