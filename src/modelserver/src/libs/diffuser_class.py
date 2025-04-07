@@ -76,7 +76,7 @@ class DiffusersModel(Model):
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
 
         if self.lora_model:
-            print(f"Loading LoRA {self.lora_model}")
+            print(f"Loading LoRA {self.lora_model} ({self.lora_weight_name})")
             pipeline.load_lora_weights(self.lora_model, weight_name=self.lora_weight_name)
 
         if self.refiner_model:
@@ -180,6 +180,10 @@ class DiffusersModel(Model):
         if self.refiner:
             payload["denoising_end"] = denoising
             payload["output_type"] = "latent"
+
+        active_adapters = self.pipeline.get_active_adapters()
+        print(f"Adapters: {active_adapters}")
+
         tensor = self.pipeline(**payload).images
         if self.refiner:
             del payload["denoising_end"]

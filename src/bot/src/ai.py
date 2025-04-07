@@ -37,7 +37,7 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
         num_inference_steps=20,
         width=1024,
         height=1024,
-        guidance_scale=7.5,
+        guidance_scale=15,
         scheduler="DPM++ SDE",
     )
     infer_request_json = json.dumps(
