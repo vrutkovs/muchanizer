@@ -12,7 +12,7 @@ from torch import Generator
 from kserve import Model, InferRequest, InferResponse
 from kserve.errors import InvalidInput
 from diffusers.models.autoencoders.autoencoder_kl import AutoencoderKL
-from diffusers.pipelines.auto_pipeline import AutoPipelineForImage2Image
+from diffusers.pipelines.auto_pipeline import StableDiffusionXLImg2ImgPipeline
 from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
 from PIL import Image
 # from diffusers.utils.pil_utils import pt_to_pil
@@ -70,18 +70,18 @@ class DiffusersModel(Model):
             pipeline_args["vae"] = vae
 
         try:
-            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, **pipeline_args)
+            pipeline = StableDiffusionXLImg2ImgPipeline.from_pretrained(self.model_id, **pipeline_args)
         except Exception:
             # try loading from a single file..
-            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
+            pipeline = StableDiffusionXLImg2ImgPipeline.from_pretrained(self.model_id, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
 
         if self.lora_model:
             print(f"Loading LoRA {self.lora_model} ({self.lora_weight_name})")
-            pipeline.load_lora_weights(self.lora_model, weight_name=self.lora_weight_name)
+            pipeline.load_lora_weights(self.lora_model, weight_name=self.lora_weight_name, adapter_name="custom_lora")
 
         if self.refiner_model:
             print(f"Loading refiner {self.refiner_model}")
-            self.refiner = AutoPipelineForImage2Image.from_pretrained(self.refiner_model, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2, device_map="balanced")
+            self.refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(self.refiner_model, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2, device_map="balanced")
 
         pipeline.enable_attention_slicing()
         pipeline.unet.to(memory_format=torch.channels_last)
@@ -164,6 +164,8 @@ class DiffusersModel(Model):
         image_b64 = payload.get("image_b64")
         image = Image.open(io.BytesIO(base64.b64decode(image_b64)))
         payload["image"] = image
+        del payload["image_b64"]
+        print(f"image: {image_b64}")
 
         if self.lora_model:
             payload["cross_attention_kwargs"] = {"scale": 0.9}
@@ -181,13 +183,16 @@ class DiffusersModel(Model):
             payload["denoising_end"] = denoising
             payload["output_type"] = "latent"
 
-        active_adapters = self.pipeline.get_active_adapters()
+        active_adapters = self.pipeline.get_list_adapters()
         print(f"Adapters: {active_adapters}")
 
-        tensor = self.pipeline(**payload).images
+        prompt = payload["prompt"]
+        del payload["prompt"]
+        tensor = self.pipeline(prompt, **payload).images
         if self.refiner:
             del payload["denoising_end"]
-            tensor = self.refiner(**payload, denoising_start=denoising, image=tensor).images
+            del payload["image"]
+            tensor = self.refiner(prompt, **payload, denoising_start=denoising, image=tensor).images
         result = tensor[0]
 
         # convert images to PNG and encode in base64
@@ -205,7 +210,7 @@ class DiffusersModel(Model):
             "predictions": [
                 {
                     "model_name": self.model_id,
-                    "prompt": payload["prompt"],
+                    "prompt": prompt,
                     "negative_prompt": payload.get("negative_prompt", ""),
                     "num_inference_steps": payload.get("num_inference_steps"),
                     "width": payload.get("width", "unspecified"),
