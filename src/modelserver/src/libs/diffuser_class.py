@@ -178,8 +178,11 @@ class DiffusersModel(Model):
         result = None
         device, dtype = get_accelerator_device()
         with torch.autocast(device):
+            if self.refiner:
+                payload["denoising_end"] = denoising
             tensor = self.pipeline(**payload).images
             if self.refiner:
+                del payload["denoising_end"]
                 tensor = self.refiner(**payload, denoising_start=denoising, image=tensor).images
             result = tensor[0]
 
