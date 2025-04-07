@@ -73,7 +73,7 @@ class DiffusersModel(Model):
             pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, **pipeline_args)
         except Exception:
             # try loading from a single file..
-            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True)
+            pipeline = AutoPipelineForImage2Image.from_pretrained(self.model_id, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
 
         if self.lora_model:
             print(f"Loading LoRA {self.lora_model}")
@@ -81,8 +81,7 @@ class DiffusersModel(Model):
 
         if self.refiner_model:
             print(f"Loading refiner {self.refiner_model}")
-            self.refiner = AutoPipelineForImage2Image.from_pretrained(self.refiner_model, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2)
-            self.refiner.to(device)
+            self.refiner = AutoPipelineForImage2Image.from_pretrained(self.refiner_model, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2, device_map="balanced")
 
         pipeline.enable_attention_slicing()
         pipeline.unet.to(memory_format=torch.channels_last)
@@ -97,8 +96,6 @@ class DiffusersModel(Model):
         # Reduce overhead
         # pipeline.unet = torch.compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
         # pipeline.vae.decode = torch.compile(pipeline.vae.decode, mode="reduce-overhead", fullgraph=True)
-
-        pipeline.to(device)
 
         self.pipeline = pipeline
         self.device = device
