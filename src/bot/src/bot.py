@@ -64,8 +64,11 @@ async def generate_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     log.info('Generating new image', id=update.update_id)
     image = Image.open(file)
-    # TODO: Resize to 512x512 here
-    new_image = await img2img_pipeline(image)
+    if update.message.caption:
+        prompt = update.message.caption
+    else:
+        prompt = "art nouveau, Realistic detail, thick lines, 8k, Alphonse Mucha Style, vintage poster, alphonse mucha art style"
+    new_image = await img2img_pipeline(image, prompt)
 
     await delete_file_from_drive(file)
     await update.message.reply_photo(new_image)

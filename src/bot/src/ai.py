@@ -24,7 +24,7 @@ HEADERS = {
 if MODEL_TOKEN:
     HEADERS["Authorization"] = f"Bearer {MODEL_TOKEN}"
 
-async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
+async def img2img_pipeline(image: ImageFile.ImageFile, prompt: str) -> ImageFile.ImageFile:
     image_bytes = io.BytesIO()
     image.save(image_bytes, format='PNG')
     image_bytes.seek(0)
@@ -32,7 +32,7 @@ async def img2img_pipeline(image: ImageFile.ImageFile) -> ImageFile.ImageFile:
 
     infer_request = InferRequest(
         image_b64=img_b64.decode("utf-8"),
-        prompt="art nouveau, Realistic detail, thick lines, 8k, Alphonse Mucha Style, vintage poster, alphonse mucha art style",
+        prompt=prompt,
         negative_prompt="ugly, deformed, disfigured, poor details, bad anatomy",
         num_inference_steps=20,
         width=1024,
