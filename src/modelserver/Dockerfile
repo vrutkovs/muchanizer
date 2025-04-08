@@ -4,7 +4,7 @@ FROM base AS builder
 COPY --from=ghcr.io/astral-sh/uv:0.6.5 /uv /bin/uv
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 USER root
-RUN dnf install -y git-lfs && \
+RUN dnf install -y git-lfs mesa-libGL && \
     dnf clean all && \
     git lfs install
 WORKDIR /app

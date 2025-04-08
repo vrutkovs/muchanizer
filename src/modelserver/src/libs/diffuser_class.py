@@ -1,4 +1,3 @@
-from statistics import mode
 #!/usr/bin/env python
 
 # base libs
@@ -12,11 +11,13 @@ import random
 from torch import Generator
 from kserve import Model, InferRequest, InferResponse
 from kserve.errors import InvalidInput
-from diffusers.models.autoencoders.autoencoder_kl import AutoencoderKL
-from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_depth2img import StableDiffusionDepth2ImgPipeline
+from diffusers.pipelines.stable_diffusion_xl.pipeline_stable_diffusion_xl_img2img import StableDiffusionXLImg2ImgPipeline
+from diffusers.models.controlnets.controlnet import ControlNetModel
+from diffusers.pipelines.controlnet.pipeline_controlnet import StableDiffusionControlNetPipeline
 from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
 from PIL import Image
-# from diffusers.utils.pil_utils import pt_to_pil
+import numpy as np
+import cv2
 
 # Torch tweaks
 import torch
@@ -40,15 +41,14 @@ class DiffusersModel(Model):
         self.ready = False
         # accelerator device
         self.device = None
-        # vae
-        self.vae_model = os.environ.get("VAE_MODEL", None)
         # lora
         self.lora_model = os.environ.get("LORA_MODEL", None)
         self.lora_weight_name = os.environ.get("LORA_WEIGHT_NAME", None)
+        self.controlnet_model = os.environ.get("CONTROLNET_MODEL", None)
 
-        print(f"VAE: {self.vae_model}")
         print(f"Lora model: {self.lora_model}")
         print(f"Lora weight name: {self.lora_weight_name}")
+        print(f"Controlnet model: {self.controlnet_model}")
 
         # load model
         self.load()
@@ -59,25 +59,23 @@ class DiffusersModel(Model):
         # detect accelerator
         device, dtype = get_accelerator_device()
 
-        pipeline_args = {
-        }
-        if self.vae_model:
-            print(f"Loading VAE {self.vae_model}")
-            vae = AutoencoderKL.from_pretrained(self.vae_model, torch_dtype=dtype)
-            pipeline_args["vae"] = vae
-
-        try:
-            pipeline = StableDiffusionDepth2ImgPipeline.from_pretrained(self.model_id, **pipeline_args)
-        except Exception:
-            # try loading from a single file..
-            pipeline = StableDiffusionDepth2ImgPipeline.from_pretrained(self.model_id, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
+        pipeline = None
+        controlnet = ControlNetModel.from_pretrained(
+            self.controlnet_model,
+            torch_dtype=dtype,
+            use_safetensors=True,
+        )
+        pipeline = StableDiffusionControlNetPipeline.from_pretrained(
+            self.model_id, controlnet=controlnet,
+            torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced"
+        )
 
         lora_noise_loaded = False
 
-        if self.model_id == "stabilityai/stable-diffusion-xl-base-1.0":
-            print("Loading Stable Diffusion XL offset noise LoRA")
-            lora_noise_loaded = True
-            pipeline.load_lora_weights(self.model_id, weight_name="sd_xl_offset_example-lora_1.0.safetensors", adapter_name="offset_noise")
+        # if self.model_id == "stabilityai/stable-diffusion-xl-base-1.0":
+        #     print("Loading Stable Diffusion XL offset noise LoRA")
+        #     lora_noise_loaded = True
+        #     pipeline.load_lora_weights(self.model_id, weight_name="sd_xl_offset_example-lora_1.0.safetensors", adapter_name="offset_noise")
 
         if self.lora_model:
             print(f"Loading LoRA {self.lora_model} ({self.lora_weight_name})")
@@ -89,7 +87,7 @@ class DiffusersModel(Model):
         pipeline.unet.to(memory_format=torch.channels_last)
         if "vae" in pipeline.components:
             pipeline.vae.to(memory_format=torch.channels_last)
-        pipeline.fuse_qkv_projections()
+        # pipeline.fuse_qkv_projections()
         pipeline.to(device)
         # pipeline.enable_model_cpu_offload()
 
@@ -169,9 +167,17 @@ class DiffusersModel(Model):
         # Convert base64 encoded image to PIL Image
         image_b64 = payload.get("image_b64")
         image = Image.open(io.BytesIO(base64.b64decode(image_b64)))
-        payload["image"] = image
         del payload["image_b64"]
         print(f"image: {image_b64}")
+
+        # Generate canny image
+        image = np.array(image)
+        image = cv2.Canny(image, 100, 200)
+        image = image[:, :, None]
+        image = np.concatenate([image, image, image], axis=2)
+        image = Image.fromarray(image)
+
+        payload["image"] = image
 
         if self.lora_model:
             payload["cross_attention_kwargs"] = {"scale": 0.9}

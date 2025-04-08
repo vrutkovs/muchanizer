@@ -16,6 +16,8 @@ dependencies = [
     "hf-xet>=1.0.0",
     "torchvision>=0.21.0",
     "peft>=0.15.1",
+    "numpy>=1.26.4",
+    "opencv-python>=4.11.0.86",
 ]
 
 [[tool.uv.index]]

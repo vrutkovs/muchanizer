@@ -1,0 +1,55 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  annotations:
+    opendatahub.io/accelerator-name: ""
+    opendatahub.io/apiProtocol: REST
+    opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
+    opendatahub.io/template-display-name: KServe Diffusers
+    opendatahub.io/template-name: kserve-diffusers
+    openshift.io/display-name: KServe Diffusers Runtime
+  name: kserve-diffusers
+  namespace: mirror-mirror
+  labels:
+    opendatahub.io/dashboard: "true"
+spec:
+  annotations:
+    prometheus.kserve.io/path: /metrics
+    prometheus.kserve.io/port: "8080"
+  containers:
+    - name: kserve-container
+      image: image-registry.openshift-image-registry.svc:5000/mirror-mirror/mirror-mirror:model
+      command:
+        - bash
+        - "-c"
+        - "huggingface-cli download ${MODEL_ID} && \
+          huggingface-cli download ${LORA_MODEL} && \
+          huggingface-cli download ${CONTROLNET_MODEL} && \
+          source /app/.venv/bin/activate && \
+          exec python /app/model.py"
+      imagePullPolicy: Always
+      envFrom:
+        - secretRef:
+            name: settings
+      ports:
+        - containerPort: 8080
+          protocol: TCP
+      volumeMounts:
+        - mountPath: /dev/shm
+          name: shm
+        - mountPath: /opt/app-root/src/.cache
+          name: hg-cache
+  multiModel: false
+  protocolVersions:
+    - v1
+  supportedModelFormats:
+    - autoSelect: true
+      name: pytorch
+  volumes:
+    - emptyDir:
+        medium: Memory
+        sizeLimit: 2Gi
+      name: shm
+    - persistentVolumeClaim:
+        claimName: hg-cache
+      name: hg-cache
