@@ -98,7 +98,8 @@ class DiffusersModel(Model):
         if "vae" in pipeline.components:
             pipeline.vae.to(memory_format=torch.channels_last)
         pipeline.fuse_qkv_projections()
-        pipeline.enable_model_cpu_offload()
+        pipeline.to(device)
+        # pipeline.enable_model_cpu_offload()
 
         # FreeU
         # pipeline.enable_freeu(s1=0.9, s2=0.2, b1=1.3, b2=1.4)
