@@ -9,10 +9,12 @@ class InferRequest:
     height: int
     scheduler: str
     guidance_scale: float
+    strength: float
     seed: int
 
     def __init__(self, image_b64: str, prompt: str, negative_prompt: str,
-                 num_inference_steps: int, width: int, height: int, scheduler: str, guidance_scale: float):
+                 num_inference_steps: int, width: int, height: int, scheduler: str,
+                 guidance_scale: float, strength: float):
         self.image_b64 = image_b64
         self.prompt = prompt
         self.negative_prompt = negative_prompt
@@ -21,6 +23,7 @@ class InferRequest:
         self.height = height
         self.scheduler = scheduler
         self.guidance_scale = guidance_scale
+        self.strength = strength
 
         self.seed = random.getrandbits(64)
 

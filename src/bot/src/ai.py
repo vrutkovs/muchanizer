@@ -9,7 +9,7 @@ import io
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
-from request import InferRequest, InferResponse
+from request import InferRequest
 import structlog
 log = structlog.get_logger()
 
@@ -24,7 +24,7 @@ HEADERS = {
 if MODEL_TOKEN:
     HEADERS["Authorization"] = f"Bearer {MODEL_TOKEN}"
 
-async def img2img_pipeline(image: Image.Image, prompt: str) -> ImageFile.ImageFile:
+async def img2img_pipeline(image: Image.Image, prompt: str) -> bytes:
     image_bytes = io.BytesIO()
     image.save(image_bytes, format='PNG')
     image_bytes.seek(0)
@@ -37,7 +37,8 @@ async def img2img_pipeline(image: Image.Image, prompt: str) -> ImageFile.ImageFi
         num_inference_steps=20,
         width=1024,
         height=1024,
-        guidance_scale=7.5,
+        guidance_scale=3.0,
+        strength=0.5,
         scheduler="DPM++ 2M",
     )
     infer_request_json = json.dumps(

@@ -13,7 +13,7 @@ from torch import Generator
 from kserve import Model, InferRequest, InferResponse
 from kserve.errors import InvalidInput
 from diffusers.models.autoencoders.autoencoder_kl import AutoencoderKL
-from diffusers.pipelines.auto_pipeline import StableDiffusionXLImg2ImgPipeline
+from diffusers.pipelines.stable_diffusion.pipeline_stable_diffusion_depth2img import StableDiffusionDepth2ImgPipeline
 from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
 from PIL import Image
 # from diffusers.utils.pil_utils import pt_to_pil
@@ -71,10 +71,10 @@ class DiffusersModel(Model):
             pipeline_args["vae"] = vae
 
         try:
-            pipeline = StableDiffusionXLImg2ImgPipeline.from_pretrained(self.model_id, **pipeline_args)
+            pipeline = StableDiffusionDepth2ImgPipeline.from_pretrained(self.model_id, **pipeline_args)
         except Exception:
             # try loading from a single file..
-            pipeline = StableDiffusionXLImg2ImgPipeline.from_pretrained(self.model_id, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
+            pipeline = StableDiffusionDepth2ImgPipeline.from_pretrained(self.model_id, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced")
 
         lora_noise_loaded = False
 
@@ -91,7 +91,7 @@ class DiffusersModel(Model):
 
         if self.refiner_model:
             print(f"Loading refiner {self.refiner_model}")
-            self.refiner = StableDiffusionXLImg2ImgPipeline.from_pretrained(self.refiner_model, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2, device_map="balanced")
+            self.refiner = StableDiffusionDepth2ImgPipeline.from_pretrained(self.refiner_model, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2, device_map="balanced")
 
         pipeline.enable_attention_slicing()
         pipeline.unet.to(memory_format=torch.channels_last)
@@ -194,7 +194,6 @@ class DiffusersModel(Model):
         # image = pt_to_pil(tensor[0])
         result = None
         if self.refiner:
-            payload["denoising_end"] = denoising
             payload["output_type"] = "latent"
 
         active_adapters = self.pipeline.get_list_adapters()
@@ -202,12 +201,7 @@ class DiffusersModel(Model):
 
         prompt = payload["prompt"]
         del payload["prompt"]
-        tensor = self.pipeline(prompt, **payload).images
-        if self.refiner:
-            del payload["denoising_end"]
-            del payload["image"]
-            tensor = self.refiner(prompt, **payload, denoising_start=denoising, image=tensor).images
-        result = tensor[0]
+        result = self.pipeline(prompt, **payload).images[0]
 
         # convert images to PNG and encode in base64
         # for easy sending via response payload
@@ -230,6 +224,7 @@ class DiffusersModel(Model):
                     "width": payload.get("width", "unspecified"),
                     "height": payload.get("height", "unspecified"),
                     "guidance_scale": payload.get("guidance_scale", "unspecified"),
+                    "strength": payload.get("strength", "unspecified"),
                     "seed": payload.get("seed", "-1"),
                     "scheduler": payload.get("scheduler", "unspecified"),
                     "image": {
