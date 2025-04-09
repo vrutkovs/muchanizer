@@ -31,7 +31,7 @@ torch.backends.cuda.matmul.allow_tf32 = True
 # instantiate this to perform image generation
 class DiffusersModel(Model):
     # initialize class
-    def __init__(self, name: str, refiner_model: str | None = None, vae_model: str | None = None, lora_model: str | None = None, lora_weight_name: str | None = None):
+    def __init__(self, name: str, vae_model: str | None = None, lora_model: str | None = None, lora_weight_name: str | None = None):
         super().__init__(name)
         self.model_id = os.environ.get("MODEL_ID", default="/mnt/models")
         # stable diffusion pipeline
@@ -40,16 +40,12 @@ class DiffusersModel(Model):
         self.ready = False
         # accelerator device
         self.device = None
-        # refiner
-        self.refiner_model = os.environ.get("REFINER_MODEL", None)
-        self.refiner = None
         # vae
         self.vae_model = os.environ.get("VAE_MODEL", None)
         # lora
         self.lora_model = os.environ.get("LORA_MODEL", None)
         self.lora_weight_name = os.environ.get("LORA_WEIGHT_NAME", None)
 
-        print(f"Refiner: {self.refiner_model}")
         print(f"VAE: {self.vae_model}")
         print(f"Lora model: {self.lora_model}")
         print(f"Lora weight name: {self.lora_weight_name}")
@@ -88,10 +84,6 @@ class DiffusersModel(Model):
             pipeline.load_lora_weights(self.lora_model, weight_name=self.lora_weight_name, adapter_name="custom_lora")
             if lora_noise_loaded:
                 pipeline.set_adapters(["offset_noise", "custom_lora"], adapter_weights=[0.7, 0.8])
-
-        if self.refiner_model:
-            print(f"Loading refiner {self.refiner_model}")
-            self.refiner = StableDiffusionDepth2ImgPipeline.from_pretrained(self.refiner_model, **pipeline_args, torch_dtype=dtype, variant="fp16", use_safetensors=True, text_encoder_2=pipeline.text_encoder_2, device_map="balanced")
 
         pipeline.enable_attention_slicing()
         pipeline.unet.to(memory_format=torch.channels_last)
@@ -192,10 +184,6 @@ class DiffusersModel(Model):
         #     tensor = self.refiner(**payload, denoising_start=denoising, image=tensor[0]).images
         # Convert tensor to PIL Image
         # image = pt_to_pil(tensor[0])
-        result = None
-        if self.refiner:
-            payload["output_type"] = "latent"
-
         active_adapters = self.pipeline.get_list_adapters()
         print(f"Adapters: {active_adapters}")
 
