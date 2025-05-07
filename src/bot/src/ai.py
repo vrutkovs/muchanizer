@@ -24,6 +24,10 @@ HEADERS = {
 if MODEL_TOKEN:
     HEADERS["Authorization"] = f"Bearer {MODEL_TOKEN}"
 
+NEGATIVE_PROMT = """
+(hands), text, error, cropped, (worst quality:1.2), (low quality:1.2), normal quality, (jpeg artifacts:1.3), signature, watermark, username, blurry, artist name, monochrome, sketch, censorship, censor, (copyright:1.2), extra legs, (forehead mark) (depth of field) (emotionless) (penis) (pumpkin) ugly, deformed, disfigured, poor details, bad anatomy
+"""
+
 async def img2img_pipeline(image: Image.Image, prompt: str) -> bytes:
     image_bytes = io.BytesIO()
     image.save(image_bytes, format='PNG')
@@ -33,7 +37,7 @@ async def img2img_pipeline(image: Image.Image, prompt: str) -> bytes:
     infer_request = InferRequest(
         image_b64=img_b64.decode("utf-8"),
         prompt=prompt,
-        negative_prompt="ugly, deformed, disfigured, poor details, bad anatomy",
+        negative_prompt=NEGATIVE_PROMT,
         num_inference_steps=20,
         width=1024,
         height=1024,
