@@ -13,7 +13,7 @@ from kserve import Model, InferRequest, InferResponse
 from kserve.errors import InvalidInput
 from diffusers.pipelines.stable_diffusion_xl.pipeline_stable_diffusion_xl_img2img import StableDiffusionXLImg2ImgPipeline
 from diffusers.models.controlnets.controlnet import ControlNetModel
-from diffusers.pipelines.controlnet.pipeline_controlnet import StableDiffusionControlNetPipeline
+from diffusers.pipelines.controlnet.pipeline_controlnet import StableDiffusionXLControlNetPipeline
 from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
 from PIL import Image
 import numpy as np
@@ -65,7 +65,7 @@ class DiffusersModel(Model):
             torch_dtype=dtype,
             use_safetensors=True,
         )
-        pipeline = StableDiffusionControlNetPipeline.from_pretrained(
+        pipeline = StableDiffusionXLControlNetPipeline.from_pretrained(
             self.model_id, controlnet=controlnet,
             torch_dtype=dtype, variant="fp16", use_safetensors=True,
         )
