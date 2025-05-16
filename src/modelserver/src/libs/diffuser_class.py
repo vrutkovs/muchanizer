@@ -67,7 +67,7 @@ class DiffusersModel(Model):
         )
         pipeline = StableDiffusionControlNetPipeline.from_pretrained(
             self.model_id, controlnet=controlnet,
-            torch_dtype=dtype, variant="fp16", use_safetensors=True, device_map="balanced"
+            torch_dtype=dtype, variant="fp16", use_safetensors=True,
         )
 
         lora_noise_loaded = False
@@ -88,8 +88,8 @@ class DiffusersModel(Model):
         if "vae" in pipeline.components:
             pipeline.vae.to(memory_format=torch.channels_last)
         # pipeline.fuse_qkv_projections()
-        pipeline.to(device)
-        # pipeline.enable_model_cpu_offload()
+        # pipeline.to(device)
+        pipeline.enable_model_cpu_offload()
 
         # FreeU
         # pipeline.enable_freeu(s1=0.9, s2=0.2, b1=1.3, b2=1.4)

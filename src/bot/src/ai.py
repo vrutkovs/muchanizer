@@ -43,7 +43,7 @@ async def img2img_pipeline(image: Image.Image, prompt: str) -> bytes:
         height=1024,
         guidance_scale=3.0,
         strength=0.5,
-        scheduler="DPM++ 2M",
+        scheduler="UniPC",
     )
     infer_request_json = json.dumps(
         {"instances": [infer_request]},

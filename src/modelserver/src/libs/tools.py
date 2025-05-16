@@ -9,7 +9,8 @@ try:
                                       EulerAncestralDiscreteScheduler,
                                       KDPM2DiscreteScheduler,
                                       HeunDiscreteScheduler,
-                                      LMSDiscreteScheduler)
+                                      LMSDiscreteScheduler,
+                                      UniPCMultistepScheduler)
 except Exception as e:
     print(f"Caught Exception during library loading: {e}")
     raise e
@@ -24,7 +25,8 @@ schedulers = {"DPM++ 2M": DPMSolverMultistepScheduler,
               "Euler a": EulerAncestralDiscreteScheduler,
               "Euler": EulerDiscreteScheduler,
               "Heun": HeunDiscreteScheduler,
-              "LMS": LMSDiscreteScheduler}
+              "LMS": LMSDiscreteScheduler,
+              "UniPC": UniPCMultistepScheduler}
 
 # check for the presence of a gpu
 def get_accelerator_device():
