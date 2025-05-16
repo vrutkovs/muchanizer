@@ -180,11 +180,10 @@ class DiffusersModel(Model):
         payload["image"] = image
 
         if self.lora_model:
-            payload["cross_attention_kwargs"] = {"scale": 0.9}
+            payload["cross_attention_kwargs"] = {"scale": payload.get("cross_attention")}
 
         # generate image
         print(f"Params: {payload}")
-        denoising = 0.8
         #tensor = self.pipeline(**payload, denoising_end=denoising, output_type="latent").images
         # if self.refiner:
         #     tensor = self.refiner(**payload, denoising_start=denoising, image=tensor[0]).images

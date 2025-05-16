@@ -14,7 +14,7 @@ class InferRequest:
 
     def __init__(self, image_b64: str, prompt: str, negative_prompt: str,
                  num_inference_steps: int, width: int, height: int, scheduler: str,
-                 guidance_scale: float, strength: float):
+                 guidance_scale: float, strength: float, cross_attention: float):
         self.image_b64 = image_b64
         self.prompt = prompt
         self.negative_prompt = negative_prompt
@@ -24,6 +24,7 @@ class InferRequest:
         self.scheduler = scheduler
         self.guidance_scale = guidance_scale
         self.strength = strength
+        self.cross_attention = cross_attention
 
         self.seed = random.getrandbits(64)
 
