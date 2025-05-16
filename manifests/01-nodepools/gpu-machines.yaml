@@ -17,7 +17,7 @@ spec:
       providerSpec:
         value:
           spotMarketOptions: {}
-          instanceType: g5.4xlarge
+          instanceType: g5.2xlarge
       taints:
         - key: nvidia.com/gpu
           effect: NoSchedule

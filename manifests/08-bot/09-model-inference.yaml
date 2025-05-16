@@ -24,12 +24,12 @@ spec:
       name: ""
       resources:
         limits:
-          cpu: "8"
-          memory: 10Gi
+          cpu: "1"
+          memory: 24Gi
           nvidia.com/gpu: "1"
         requests:
-          cpu: "4"
-          memory: 8Gi
+          cpu: "1"
+          memory: 12Gi
           nvidia.com/gpu: "1"
       runtime: kserve-diffusers
     tolerations:
