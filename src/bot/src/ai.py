@@ -29,6 +29,8 @@ NEGATIVE_PROMT = """
 """
 
 async def img2img_pipeline(image: Image.Image, prompt: str) -> bytes:
+    width, height = image.size
+
     image_bytes = io.BytesIO()
     image.save(image_bytes, format='PNG')
     image_bytes.seek(0)
@@ -39,8 +41,8 @@ async def img2img_pipeline(image: Image.Image, prompt: str) -> bytes:
         prompt=prompt,
         negative_prompt=NEGATIVE_PROMT,
         num_inference_steps=20,
-        width=1024,
-        height=1024,
+        width=width,
+        height=height,
         guidance_scale=3.0,
         strength=0.5,
         scheduler="UniPC",
