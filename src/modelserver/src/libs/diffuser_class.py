@@ -13,7 +13,7 @@ from kserve import Model, InferRequest, InferResponse
 from kserve.errors import InvalidInput
 from diffusers.pipelines.stable_diffusion_xl.pipeline_stable_diffusion_xl_img2img import StableDiffusionXLImg2ImgPipeline
 from diffusers.models.controlnets.controlnet import ControlNetModel
-from diffusers.pipelines.controlnet.pipeline_controlnet import StableDiffusionXLControlNetPipeline
+from diffusers import StableDiffusionXLControlNetPipeline
 from .tools import get_accelerator_device, schedulers, RANDOM_BITS_LENGTH
 from PIL import Image
 import numpy as np
@@ -72,10 +72,10 @@ class DiffusersModel(Model):
 
         lora_noise_loaded = False
 
-        # if self.model_id == "stabilityai/stable-diffusion-xl-base-1.0":
-        #     print("Loading Stable Diffusion XL offset noise LoRA")
-        #     lora_noise_loaded = True
-        #     pipeline.load_lora_weights(self.model_id, weight_name="sd_xl_offset_example-lora_1.0.safetensors", adapter_name="offset_noise")
+        if self.model_id == "stabilityai/stable-diffusion-xl-base-1.0":
+            print("Loading Stable Diffusion XL offset noise LoRA")
+            lora_noise_loaded = True
+            pipeline.load_lora_weights(self.model_id, weight_name="sd_xl_offset_example-lora_1.0.safetensors", adapter_name="offset_noise")
 
         if self.lora_model:
             print(f"Loading LoRA {self.lora_model} ({self.lora_weight_name})")
@@ -88,8 +88,8 @@ class DiffusersModel(Model):
         if "vae" in pipeline.components:
             pipeline.vae.to(memory_format=torch.channels_last)
         # pipeline.fuse_qkv_projections()
-        # pipeline.to(device)
-        pipeline.enable_model_cpu_offload()
+        pipeline.to(device)
+        # pipeline.enable_model_cpu_offload()
 
         # FreeU
         # pipeline.enable_freeu(s1=0.9, s2=0.2, b1=1.3, b2=1.4)
