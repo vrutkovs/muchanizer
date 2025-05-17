@@ -158,7 +158,7 @@ class DiffusersModel(Model):
         payload["image"] = image
 
         if self.lora_model:
-            payload["cross_attention_kwargs"] = {"scale": payload.get("strength")}
+            payload["controlnet_conditioning_scale"] = payload.get("strength")
 
         # generate image
         print(f"Params: {payload}")
