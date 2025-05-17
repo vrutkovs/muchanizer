@@ -8,6 +8,8 @@ stringData:
     TELEGRAM_TOKEN = ""
     MODEL_TOKEN = ""
     MODEL_ENDPOINT = ""
+    STRENGTH = 0.25
+    GUIDANCE_SCALE = 3.0
   HF_TOKEN: foobar
   MODEL_ID: "stabilityai/stable-diffusion-xl-base-1.0"
   CONTROLNET_MODEL: "diffusers/controlnet-canny-sdxl-1.0"

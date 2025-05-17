@@ -28,6 +28,9 @@ NEGATIVE_PROMT = """
 (hands), text, error, cropped, (worst quality:1.2), (low quality:1.2), normal quality, (jpeg artifacts:1.3), signature, watermark, username, blurry, artist name, monochrome, sketch, censorship, censor, (copyright:1.2), extra legs, (forehead mark) (depth of field) (emotionless) (penis) (pumpkin) ugly, deformed, disfigured, poor details, bad anatomy
 """
 
+GUIDANCE_SCALE: Final = float(os.getenv("GUIDANCE_SCALE") or 3.0)
+STRENGTH: Final = float(os.getenv("STRENGTH") or 0.25)
+
 async def img2img_pipeline(image: Image.Image, prompt: str) -> bytes:
     width, height = image.size
 
@@ -43,9 +46,9 @@ async def img2img_pipeline(image: Image.Image, prompt: str) -> bytes:
         num_inference_steps=20,
         width=width,
         height=height,
-        guidance_scale=3.0,
+        guidance_scale=GUIDANCE_SCALE,
         scheduler="DPM++ 2M",
-        strength=0.25,
+        strength=STRENGTH,
     )
     infer_request_json = json.dumps(
         {"instances": [infer_request]},
