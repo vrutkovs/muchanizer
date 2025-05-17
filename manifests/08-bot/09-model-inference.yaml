@@ -2,13 +2,13 @@ apiVersion: serving.kserve.io/v1beta1
 kind: InferenceService
 metadata:
   annotations:
-    openshift.io/display-name: mirror-mirror
+    openshift.io/display-name: muchanizer
     serving.knative.openshift.io/enablePassthrough: "true"
     serving.kserve.io/deploymentMode: Serverless
     sidecar.istio.io/inject: "true"
     sidecar.istio.io/rewriteAppHTTPProbers: "true"
-  name: mirror-mirror
-  namespace: mirror-mirror
+  name: muchanizer
+  namespace: muchanizer
   labels:
     opendatahub.io/dashboard: "true"
 spec:

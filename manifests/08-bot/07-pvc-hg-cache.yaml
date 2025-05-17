@@ -2,7 +2,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: hg-cache
-  namespace: mirror-mirror
+  namespace: muchanizer
   labels:
     opendatahub.io/dashboard: "true"
 spec:

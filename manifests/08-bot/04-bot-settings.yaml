@@ -2,7 +2,7 @@ kind: Secret
 apiVersion: v1
 metadata:
   name: settings
-  namespace: mirror-mirror
+  namespace: muchanizer
 stringData:
   .env: |
     TELEGRAM_TOKEN = ""
