@@ -79,22 +79,8 @@ class DiffusersModel(Model):
 
         pipeline.enable_attention_slicing()
         pipeline.unet.to(memory_format=torch.channels_last)
-        if "vae" in pipeline.components:
-            pipeline.vae.to(memory_format=torch.channels_last)
-        # pipeline.fuse_qkv_projections()
         pipeline.to(device)
         # pipeline.enable_model_cpu_offload()
-
-        # FreeU
-        # pipeline.enable_freeu(s1=0.9, s2=0.2, b1=1.3, b2=1.4)
-
-        # Max autotune
-        # pipeline.unet = torch.compile(pipeline.unet, mode="max-autotune", fullgraph=True)
-        # pipeline.vae.decode = torch.compile(pipeline.vae.decode, mode="max-autotune", fullgraph=True)
-
-        # Reduce overhead
-        # pipeline.unet = torch.compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
-        # pipeline.vae.decode = torch.compile(pipeline.vae.decode, mode="reduce-overhead", fullgraph=True)
 
         self.pipeline = pipeline
         self.device = device
@@ -178,11 +164,7 @@ class DiffusersModel(Model):
 
         # generate image
         print(f"Params: {payload}")
-        #tensor = self.pipeline(**payload, denoising_end=denoising, output_type="latent").images
-        # if self.refiner:
-        #     tensor = self.refiner(**payload, denoising_start=denoising, image=tensor[0]).images
-        # Convert tensor to PIL Image
-        # image = pt_to_pil(tensor[0])
+
         active_adapters = self.pipeline.get_list_adapters()
         print(f"Adapters: {active_adapters}")
 
