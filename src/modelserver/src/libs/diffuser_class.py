@@ -32,7 +32,7 @@ torch.backends.cuda.matmul.allow_tf32 = True
 # instantiate this to perform image generation
 class DiffusersModel(Model):
     # initialize class
-    def __init__(self, name: str, vae_model: str | None = None, lora_model: str | None = None, lora_weight_name: str | None = None):
+    def __init__(self, name: str):
         super().__init__(name)
         self.model_id = os.environ.get("MODEL_ID", default="/mnt/models")
         # stable diffusion pipeline
@@ -44,10 +44,12 @@ class DiffusersModel(Model):
         # lora
         self.lora_model = os.environ.get("LORA_MODEL", None)
         self.lora_weight_name = os.environ.get("LORA_WEIGHT_NAME", None)
+        self.lora_weight_scale = os.environ.get("LORA_WEIGHT_SCALE", None)
         self.controlnet_model = os.environ.get("CONTROLNET_MODEL", None)
 
         print(f"Lora model: {self.lora_model}")
         print(f"Lora weight name: {self.lora_weight_name}")
+        print(f"Lora weight scale: {self.lora_weight_scale}")
         print(f"Controlnet model: {self.controlnet_model}")
 
         # load model
@@ -70,18 +72,10 @@ class DiffusersModel(Model):
             torch_dtype=dtype, variant="fp16", use_safetensors=True,
         )
 
-        lora_noise_loaded = False
-
-        if self.model_id == "stabilityai/stable-diffusion-xl-base-1.0":
-            print("Loading Stable Diffusion XL offset noise LoRA")
-            lora_noise_loaded = True
-            pipeline.load_lora_weights(self.model_id, weight_name="sd_xl_offset_example-lora_1.0.safetensors", adapter_name="offset_noise")
-
         if self.lora_model:
             print(f"Loading LoRA {self.lora_model} ({self.lora_weight_name})")
             pipeline.load_lora_weights(self.lora_model, weight_name=self.lora_weight_name, adapter_name="custom_lora")
-            if lora_noise_loaded:
-                pipeline.set_adapters(["offset_noise", "custom_lora"], adapter_weights=[0.7, 0.8])
+            pipeline.set_adapters(["custom_lora"], adapter_weights=[0.8])
 
         pipeline.enable_attention_slicing()
         pipeline.unet.to(memory_format=torch.channels_last)
