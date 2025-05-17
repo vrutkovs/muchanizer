@@ -76,7 +76,7 @@ class DiffusersModel(Model):
 
         pipeline.enable_attention_slicing()
         pipeline.unet.to(memory_format=torch.channels_last)
-        pipeline.unet = torch.compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
+        # pipeline.unet = torch.compile(pipeline.unet, mode="reduce-overhead", fullgraph=True)
         pipeline.to(device)
         # pipeline.enable_model_cpu_offload()
 
