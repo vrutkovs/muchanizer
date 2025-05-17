@@ -13,5 +13,4 @@ stringData:
   CONTROLNET_MODEL: "diffusers/controlnet-canny-sdxl-1.0"
   LORA_MODEL: "KappaNeuro/alphonse-mucha-style"
   LORA_WEIGHT_NAME: "Alphonse Mucha Style.safetensors"
-  LORA_WEIGHT_SCALE: "0.1"
 type: Opaque
