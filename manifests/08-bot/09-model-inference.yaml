@@ -3,7 +3,6 @@ kind: InferenceService
 metadata:
   annotations:
     openshift.io/display-name: mirror-mirror
-    security.opendatahub.io/enable-auth: "true"
     serving.knative.openshift.io/enablePassthrough: "true"
     serving.kserve.io/deploymentMode: Serverless
     sidecar.istio.io/inject: "true"
