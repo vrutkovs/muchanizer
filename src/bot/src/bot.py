@@ -71,8 +71,7 @@ async def generate_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         prompt = DEFAULT_PROMPT
 
-    resized_original = scale_and_paste(image)
-    new_image = await img2img_pipeline(resized_original, prompt)
+    new_image = await img2img_pipeline(image, prompt)
 
     await delete_file_from_drive(file)
     await update.message.reply_photo(new_image)
