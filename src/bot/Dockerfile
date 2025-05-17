@@ -1,6 +1,4 @@
-FROM registry.access.redhat.com/ubi9/python-312:9.5 AS base
-
-FROM base AS builder
+FROM registry.access.redhat.com/ubi9/python-312:9.5
 COPY --from=ghcr.io/astral-sh/uv:0.6.5 /uv /bin/uv
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 WORKDIR /app
