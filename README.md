@@ -1,4 +1,4 @@
-Muchanizer
+# Muchanizer
 
 Muchanizer is an AI image transformation system that turns regular photos into Alphonse Mucha-inspired artistic images. It consists of a Telegram bot interface that allows users to easily transform their images with a simple message. It also includes manifests to run this on OpenShift.
 
