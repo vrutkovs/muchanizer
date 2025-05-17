@@ -44,7 +44,7 @@ class DiffusersModel(Model):
         # lora
         self.lora_model = os.environ.get("LORA_MODEL", None)
         self.lora_weight_name = os.environ.get("LORA_WEIGHT_NAME", None)
-        self.lora_weight_scale = os.environ.get("LORA_WEIGHT_SCALE", None)
+        self.lora_weight_scale = os.environ.get("LORA_WEIGHT_SCALE", 0.8)
         self.controlnet_model = os.environ.get("CONTROLNET_MODEL", None)
 
         print(f"Lora model: {self.lora_model}")
@@ -75,7 +75,7 @@ class DiffusersModel(Model):
         if self.lora_model:
             print(f"Loading LoRA {self.lora_model} ({self.lora_weight_name})")
             pipeline.load_lora_weights(self.lora_model, weight_name=self.lora_weight_name, adapter_name="custom_lora")
-            pipeline.set_adapters(["custom_lora"], adapter_weights=[0.8])
+            pipeline.set_adapters(["custom_lora"], adapter_weights=[self.lora_weight_scale])
 
         pipeline.enable_attention_slicing()
         pipeline.unet.to(memory_format=torch.channels_last)
