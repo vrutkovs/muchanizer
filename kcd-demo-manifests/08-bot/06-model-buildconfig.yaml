@@ -4,6 +4,7 @@ metadata:
   annotations:
     app.openshift.io/vcs-ref: ""
     app.openshift.io/vcs-uri: "https://github.com/vrutkovs/muchanizer"
+    argocd.argoproj.io/sync-wave: "3"
   name: mirror-model
   namespace: muchanizer
   labels:

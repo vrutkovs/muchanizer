@@ -8,6 +8,7 @@ metadata:
     app.openshift.io/vcs-uri: "https://github.com/vrutkovs/muchanizer"
     deployment.kubernetes.io/revision: "1"
     image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"muchanizer:bot","namespace":"muchanizer"},"fieldPath":"spec.template.spec.containers[?(@.name==\"mirror-bot\")].image","paused":false}]'
+    argocd.argoproj.io/sync-wave: "3"
   name: mirror-bot
   namespace: muchanizer
   labels:

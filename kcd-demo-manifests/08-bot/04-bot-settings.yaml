@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: server-settings
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 type: Opaque
 stringData:
   .env: |
