@@ -8,6 +8,8 @@ metadata:
     opendatahub.io/template-display-name: KServe Diffusers
     opendatahub.io/template-name: kserve-diffusers
     openshift.io/display-name: KServe Diffusers Runtime
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   name: kserve-diffusers
   namespace: muchanizer
   labels:

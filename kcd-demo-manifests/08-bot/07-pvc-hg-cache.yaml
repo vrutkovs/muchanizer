@@ -1,0 +1,15 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: hg-cache
+  namespace: muchanizer
+  labels:
+    opendatahub.io/dashboard: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: gp3-csi
+  volumeMode: Filesystem
