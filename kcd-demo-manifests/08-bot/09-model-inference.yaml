@@ -1,0 +1,37 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  annotations:
+    openshift.io/display-name: muchanizer
+    serving.knative.openshift.io/enablePassthrough: "true"
+    serving.kserve.io/deploymentMode: Serverless
+    sidecar.istio.io/inject: "true"
+    sidecar.istio.io/rewriteAppHTTPProbers: "true"
+  name: muchanizer
+  namespace: muchanizer
+  labels:
+    opendatahub.io/dashboard: "true"
+spec:
+  predictor:
+    annotations:
+      serving.knative.dev/progress-deadline: 30m
+    maxReplicas: 1
+    minReplicas: 1
+    model:
+      modelFormat:
+        name: pytorch
+      name: ""
+      resources:
+        limits:
+          cpu: "1"
+          memory: 24Gi
+          nvidia.com/gpu: "1"
+        requests:
+          cpu: "1"
+          memory: 12Gi
+          nvidia.com/gpu: "1"
+      runtime: kserve-diffusers
+    tolerations:
+      - effect: NoSchedule
+        key: nvidia.com/gpu
+        operator: Exists

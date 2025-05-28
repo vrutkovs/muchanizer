@@ -1,0 +1,19 @@
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  annotations:
+    app.openshift.io/vcs-ref: ""
+    app.openshift.io/vcs-uri: "https://github.com/vrutkovs/muchanizer"
+  name: muchanizer
+  namespace: muchanizer
+  labels:
+    app: muchanizer
+    app.kubernetes.io/component: muchanizer
+    app.kubernetes.io/instance: muchanizer
+    app.kubernetes.io/name: muchanizer
+    app.kubernetes.io/part-of: muchanizer-app
+    app.openshift.io/runtime: python
+    app.openshift.io/runtime-version: 3.12-ubi8
+spec:
+  lookupPolicy:
+    local: false

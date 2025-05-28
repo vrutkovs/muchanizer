@@ -1,0 +1,18 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: settings
+  namespace: muchanizer
+stringData:
+  .env: |
+    TELEGRAM_TOKEN = ""
+    MODEL_TOKEN = ""
+    MODEL_ENDPOINT = ""
+    STRENGTH = 0.66
+    GUIDANCE_SCALE = 4.0
+  HF_TOKEN: foobar
+  MODEL_ID: "stabilityai/stable-diffusion-xl-base-1.0"
+  CONTROLNET_MODEL: "diffusers/controlnet-canny-sdxl-1.0"
+  LORA_MODEL: "KappaNeuro/alphonse-mucha-style"
+  LORA_WEIGHT_NAME: "Alphonse Mucha Style.safetensors"
+type: Opaque
