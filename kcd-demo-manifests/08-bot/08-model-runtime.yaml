@@ -41,6 +41,9 @@ spec:
           name: shm
         - mountPath: /opt/app-root/src/.cache
           name: hg-cache
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
   multiModel: false
   protocolVersions:
     - v1
