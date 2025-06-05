@@ -1,3 +1,9 @@
+# export HF_HUB_ENABLE_HF_TRANSFER=1 && \
+#           huggingface-cli download ${MODEL_ID} && \
+#           huggingface-cli download ${LORA_MODEL} && \
+#           huggingface-cli download ${CONTROLNET_MODEL} && \
+          
+
 apiVersion: serving.kserve.io/v1alpha1
 kind: ServingRuntime
 metadata:
@@ -24,11 +30,7 @@ spec:
       command:
         - bash
         - "-c"
-        - "export HF_HUB_ENABLE_HF_TRANSFER=1 && \
-          huggingface-cli download ${MODEL_ID} && \
-          huggingface-cli download ${LORA_MODEL} && \
-          huggingface-cli download ${CONTROLNET_MODEL} && \
-          source /app/.venv/bin/activate && \
+        - "source /app/.venv/bin/activate && \
           exec python /app/model.py"
       imagePullPolicy: Always
       envFrom:
